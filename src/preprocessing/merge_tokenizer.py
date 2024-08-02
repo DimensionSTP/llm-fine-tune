@@ -20,17 +20,25 @@ from omegaconf import DictConfig
 def merge_tokenizer(
     config: DictConfig,
 ) -> None:
+    korean_tokenizer = AutoTokenizer.from_pretrained(config.korean_model_name)
     tokenizer = AutoTokenizer.from_pretrained(config.pretrained_model_name)
 
-    sp = spm.SentencePieceProcessor()
-    sp.load(f"{config.connected_dir}/data/sentencepiece/{config.dataset_name}.model")
+    def is_korean(token):
+        for char in token:
+            if (
+                "\uAC00" <= char <= "\uD7A3"
+                or "\u1100" <= char <= "\u11FF"
+                or "\u3130" <= char <= "\u318F"
+            ):
+                return True
+        return False
 
-    new_tokens = []
-    for idx in range(sp.get_piece_size()):
-        token = sp.id_to_piece(idx)
-        if token not in tokenizer.get_vocab():
-            new_tokens.append(token)
+    korean_tokenizer_tokens = korean_tokenizer.get_vocab().keys()
+    korean_tokens = [token for token in korean_tokenizer_tokens if is_korean(token)]
+    korean_tokens = korean_tokens[: config.add_vocab_size]
 
+    tokenizer_tokens = tokenizer.get_vocab().keys()
+    new_tokens = [token for token in korean_tokens if token not in tokenizer_tokens]
     tokenizer.add_tokens(new_tokens)
 
     if not os.path.exists(
