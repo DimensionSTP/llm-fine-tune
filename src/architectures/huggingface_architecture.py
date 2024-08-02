@@ -1,13 +1,10 @@
 from typing import Dict, Any
 import os
 
-import numpy as np
 import pandas as pd
 
 import torch
 from torch import optim, nn
-
-from einops import repeat
 
 from lightning.pytorch import LightningModule
 
@@ -233,65 +230,9 @@ class HuggingFaceArchitecture(LightningModule):
             target_max_length=self.target_max_length,
             target_min_length=self.target_min_length,
         )
-        scores = output.scores
-        logit = torch.stack(scores, dim=1)
         generation = output.sequences
         input_length = len(encoded["input_ids"][0])
         generation = generation[:, input_length:]
-
-        if len(logit.shape) < 3:
-            logit = logit.unsqueeze(0)
-        index_expanded = repeat(
-            index,
-            "batch_size -> batch_size generation_max_length 1",
-            generation_max_length=self.target_max_length,
-        )
-        if logit.size(dim=1) < self.target_max_length:
-            remaining_length = self.target_max_length - logit.size(dim=1)
-            pad_logit = torch.zeros(
-                (
-                    logit.size(
-                        dim=0,
-                    ),
-                    remaining_length,
-                    logit.size(
-                        dim=2,
-                    ),
-                ),
-                device=logit.device,
-            )
-            pad_logit[:, :, self.data_encoder.pad_token_id] = 1
-            logit = torch.cat(
-                (
-                    logit,
-                    pad_logit,
-                ),
-                dim=1,
-            )
-        logit_with_index = (
-            torch.cat(
-                (
-                    logit,
-                    index_expanded,
-                ),
-                dim=-1,
-            )
-            .cpu()
-            .numpy()
-        )
-        if not os.path.exists(f"{self.per_device_save_path}/logits"):
-            os.makedirs(
-                f"{self.per_device_save_path}/logits",
-                exist_ok=True,
-            )
-        logit_file = f"{self.per_device_save_path}/logits/device_num={device_num}-batch_idx={batch_idx}.npy"
-        if not os.path.exists(logit_file):
-            np.save(
-                logit_file,
-                logit_with_index,
-            )
-        else:
-            raise FileExistsError(f"{logit_file} already exists")
 
         decoded_generation = self.data_encoder.batch_decode(
             sequences=generation,
