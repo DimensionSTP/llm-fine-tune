@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - dataset: huggingface_upstagedocumentqa_dataset
+  - dataset: huggingface_llmkorean_dataset
   - architecture: huggingface_architecture
   - tuner: huggingface_tuner
   - logger: wandb
@@ -8,7 +8,7 @@ defaults:
   - callbacks: callbacks
   - trainer: trainer
 
-package_name: upstage-ir
+package_name: llm-korean-fine-tune
 project_dir: ${oc.env:PROJECT_DIR}/${package_name}
 connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
 
@@ -24,17 +24,17 @@ batch_size: 32
 
 split_ratio: 0.1
 is_preprocessed: True
-data_column_name: question
-prompt_column_name: cut_prompt
-target_column_name: answer
-upload_user: beomi
-model_type: OPEN-SOLAR-KO-10.7B
+system_prompt_column_name: system_prompt
+data_column_name: instruction
+target_column_name: output
+upload_user: meta-llama
+model_type: Meta-Llama-3.1-8B-Instruct
 pretrained_model_name: ${upload_user}/${model_type}
 custom_data_encoder_path: ${connected_dir}/data/merged_tokenizer
 merged_model_path: ${connected_dir}/data/merged_model/${pretrained_model_name}
-data_max_length: 508
-target_max_length: 260
-target_min_length: 21
+data_max_length: 384
+target_max_length: 384
+target_min_length: 16
 
 quantization_type: origin
 quantization_config:
@@ -71,13 +71,13 @@ accelerator: gpu
 strategy: deepspeed_stage_3_offload
 log_every_n_steps: 10
 precision: bf16
-accumulate_grad_batches: 1
+accumulate_grad_batches: 4
 gradient_clip_val: 1
 gradient_clip_algorithm: norm
 epoch: 100
 
 model_name: HuggingFace
-dataset_name: UpStageDocumentQA
+dataset_name: LLMKorean
 mode: train
 
 is_tuned: tuned
@@ -99,11 +99,11 @@ pred_name: ${save_detail}-epoch=${epoch}
 submission_name: ${save_detail}-epoch=${epoch}
 
 user_name: ${oc.env:USER_NAME}
-upload_tag: scientificQA
+upload_tag: LLMKorean
 num_safetensors: 10
 
-openai_api_key: ${oc.env:OPENAI_API_KEY}
-google_api_key: ${oc.env:GOOGLE_API_KEY}
+korean_model_name: beomi/OPEN-SOLAR-KO-10.7B
+add_vocab_size: 14464
 
 run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}
