@@ -1,11 +1,11 @@
-_target_: src.datasets.huggingface_dataset.UpStageDocumentQADataset
+_target_: src.datasets.huggingface_dataset.LLMKoreanDataset
 data_path: ${connected_dir}/data
 split: ${split.train}
 split_ratio: ${split_ratio}
 seed: ${seed}
 is_preprocessed: ${is_preprocessed}
+system_prompt_column_name: ${system_prompt_column_name}
 data_column_name: ${data_column_name}
-prompt_column_name: ${prompt_column_name}
 target_column_name: ${target_column_name}
 num_devices: ${devices}
 batch_size: ${batch_size}
