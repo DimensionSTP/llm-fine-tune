@@ -1,16 +1,16 @@
-# Backbone model fine-tuning pipeline for IR competition
+# Korean (s)LLM model fine-tuning pipeline
 
-## For Upstage IR competition
+## For (s)LLM model fine-tuning
 
 ### Dataset
-Upstage IR competition dataset(information retrieval document question-answer pair dataset)
+HuggingFace Korean dataset(preprocessed as system_prompt, instruction, and output)
 
 ### Quick setup
 
 ```bash
 # clone project
-git clone https://github.com/DimensionSTP/upstage-ir.git
-cd upstage-ir
+git clone https://github.com/DimensionSTP/llm-korean-fine-tune.git
+cd llm-korean-fine-tune
 
 # [OPTIONAL] create conda environment
 conda create -n myenv python=3.8
