@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 from transformers import AutoTokenizer
 
 
-class UpStageDocumentQADataset(Dataset):
+class LLMKoreanDataset(Dataset):
     def __init__(
         self,
         data_path: str,
@@ -17,8 +17,8 @@ class UpStageDocumentQADataset(Dataset):
         split_ratio: float,
         seed: int,
         is_preprocessed: bool,
+        system_prompt_column_name: str,
         data_column_name: str,
-        prompt_column_name: str,
         target_column_name: str,
         num_devices: int,
         batch_size: int,
@@ -32,8 +32,8 @@ class UpStageDocumentQADataset(Dataset):
         self.split_ratio = split_ratio
         self.seed = seed
         self.is_preprocessed = is_preprocessed
+        self.system_prompt_column_name = system_prompt_column_name
         self.data_column_name = data_column_name
-        self.prompt_column_name = prompt_column_name
         self.target_column_name = target_column_name
         self.num_devices = num_devices
         self.batch_size = batch_size
@@ -51,6 +51,7 @@ class UpStageDocumentQADataset(Dataset):
         if self.data_encoder.pad_token_id is None:
             self.data_encoder.pad_token_id = self.data_encoder.eos_token_id
         dataset = self.get_dataset()
+        self.system_prompts = dataset["system_prompts"]
         self.datas = dataset["datas"]
         self.labels = dataset["labels"]
         self.data_max_length = data_max_length
@@ -63,13 +64,11 @@ class UpStageDocumentQADataset(Dataset):
         self,
         idx: int,
     ) -> Dict[str, Any]:
-        if self.is_preprocessed:
-            prompt = self.datas[idx] + self.labels[idx]
-        else:
-            prompt = self.generate_prompt(
-                data=self.datas[idx],
-                label=self.labels[idx],
-            )
+        prompt = self.generate_prompt(
+            system_prompt=self.system_prompts[idx],
+            data=self.datas[idx],
+            label=self.labels[idx],
+        )
         encoded = self.encode_text(
             data=prompt,
             data_type="data",
@@ -83,11 +82,8 @@ class UpStageDocumentQADataset(Dataset):
 
     def get_dataset(self) -> Dict[str, List[Any]]:
         if self.split in ["train", "val"]:
-            if self.is_preprocessed:
-                csv_path = f"{self.data_path}/preprocessed_dataset/{self.pretrained_model_name}/train.csv"
-            else:
-                csv_path = f"{self.data_path}/train.csv"
-            data = pd.read_csv(csv_path)
+            parquet_path = f"{self.data_path}/train.parquet"
+            data = pd.read_parquet(parquet_path)
             data = data.fillna("_")
             train_data, val_data = train_test_split(
                 data,
@@ -100,18 +96,12 @@ class UpStageDocumentQADataset(Dataset):
             else:
                 data = val_data
         elif self.split == "test":
-            if self.is_preprocessed:
-                csv_path = f"{self.data_path}/preprocessed_dataset/{self.pretrained_model_name}/{self.split}.csv"
-            else:
-                csv_path = f"{self.data_path}/{self.split}.csv"
-            data = pd.read_csv(csv_path)
+            parquet_path = f"{self.data_path}/{self.split}.parquet"
+            data = pd.read_parquet(parquet_path)
             data = data.fillna("_")
         elif self.split == "predict":
-            if self.is_preprocessed:
-                csv_path = f"{self.data_path}/preprocessed_dataset/{self.pretrained_model_name}/test.csv"
-            else:
-                csv_path = f"{self.data_path}/test.csv"
-            data = pd.read_csv(csv_path)
+            parquet_path = f"{self.data_path}/test.parquet"
+            data = pd.read_parquet(parquet_path)
             data = data.fillna("_")
             if self.num_devices > 1:
                 last_row = data.iloc[-1]
@@ -133,12 +123,13 @@ class UpStageDocumentQADataset(Dataset):
                     )
         else:
             raise ValueError(f"Inavalid split: {self.split}")
-        if self.is_preprocessed:
-            datas = data[self.prompt_column_name].tolist()
-        else:
-            datas = data[self.data_column_name].apply(lambda x: x.strip()).tolist()
-        labels = data[self.target_column_name].tolist()
+        system_prompts = (
+            data[self.system_prompt_column_name].apply(lambda x: x.strip()).tolist()
+        )
+        datas = data[self.data_column_name].apply(lambda x: x.strip()).tolist()
+        labels = data[self.target_column_name].apply(lambda x: x.strip()).tolist()
         return {
+            "system_prompts": system_prompts,
             "datas": datas,
             "labels": labels,
         }
@@ -170,62 +161,26 @@ class UpStageDocumentQADataset(Dataset):
 
     def generate_prompt(
         self,
+        system_prompt: str,
         data: str,
         label: str,
     ) -> str:
-        default_system_prompt = """
-너의 역할은 과학 질문에 대한 답변을 제공하는 챗봇이야.
-너의 구체적인 목표는 사용자들이 과학적 주제에 대해 궁금해하는 질문에 명확하고 정확한 답변을 제공하는 것입니다.
-하지만 과학 관련 질문이 아닌 경우, "답변 불가능."으로 응답해야 해.
-이 규칙을 엄격히 준수해줘.
-아래의 예시를 참고해.
-
-**예시 1**:
-질문:
-태양은 어떻게 에너지를 생성하나요?
-응답:
-태양은 핵융합 반응을 통해 에너지를 생성합니다.
-태양의 중심부에서 수소 원자들이 고온과 고압 상태에서 헬륨으로 융합되면서 엄청난 양의 에너지가 방출됩니다.
-이 에너지는 태양의 표면을 통해 빛과 열의 형태로 우주로 방출됩니다.
-
-**예시 2**:
-질문:
-이탈리아의 수도는 어디인가요?
-응답:
-답변 불가능.
-
-**예시 3**:
-질문:
-물의 분자는 어떤 구조를 가지고 있나요?
-응답:
-물 분자는 두 개의 수소 원자와 한 개의 산소 원자로 이루어져 있습니다.
-이들은 공유 결합을 통해 결합하며, 물 분자는 V자 모양을 하고 있습니다.
-산소 원자는 약간 음전하를 띠고 수소 원자는 약간 양전하를 띠어 물 분자는 극성을 가지게 됩니다.
-
-**예시 4**:
-질문:
-바나나의 영어 단어는 무엇인가요?
-응답:
-답변 불가능.
-
-이와 같이, 과학 관련 질문에만 상세히 응답하고, 과학 관련이 아닌 질문에는 "답변 불가능."으로 응답해줘.
-"""
         if self.split == "predict":
-            prompt = f"""### Instruction:
-{default_system_prompt} 
+            prompt = f"""### System prompt:
+{system_prompt} 
 
-### Input:
+### Instruction:
 {data.strip()}
 
-### Response:
+### Output:
 """.strip()
         else:
-            prompt = f"""### Instruction:
-{default_system_prompt} 
+            prompt = f"""### System prompt:
+{system_prompt} 
 
-### Input:
+### Instruction:
 {data.strip()}
 
-### Response:
+### Output:
 {label} """.strip()
         return prompt
