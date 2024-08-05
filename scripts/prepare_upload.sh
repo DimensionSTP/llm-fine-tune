@@ -13,7 +13,8 @@ data_max_length=384
 target_max_length=384
 precision="bf16"
 batch_size=32
-epoch=10
+epoch=2
+model_detail="llama-3.1-8B-instruct"
 
 python $path/prepare_upload.py \
     is_preprocessed=$is_preprocessed \
@@ -28,4 +29,5 @@ python $path/prepare_upload.py \
     target_max_length=$target_max_length \
     precision=$precision \
     batch_size=$batch_size \
-    epoch=$epoch
+    epoch=$epoch \
+    model_detail=$model_detail
