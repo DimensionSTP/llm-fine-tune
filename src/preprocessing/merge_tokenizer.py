@@ -7,7 +7,6 @@ dotenv.load_dotenv(
 import os
 
 from transformers import AutoTokenizer
-import sentencepiece as spm
 
 import hydra
 from omegaconf import DictConfig
