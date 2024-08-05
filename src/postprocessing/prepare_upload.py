@@ -49,17 +49,13 @@ def prepare_upload(
             model_state_dict[k] = v
 
     if config.is_preprocessed:
-        if os.path.exists(f"{config.merged_model_path}/{config.pretrained_model_name}"):
-            model_path = f"{config.merged_model_path}/{config.pretrained_model_name}"
+        if os.path.exists(config.merged_model_path):
+            model_path = config.merged_model_path
         else:
             model_path = config.pretrained_model_name
 
-        if os.path.exists(
-            f"{config.custom_data_encoder_path}/{config.pretrained_model_name}"
-        ):
-            data_encoder_path = (
-                f"{config.custom_data_encoder_path}/{config.pretrained_model_name}"
-            )
+        if os.path.exists(config.custom_data_encoder_path):
+            data_encoder_path = config.custom_data_encoder_path
         else:
             data_encoder_path = config.pretrained_model_name
 
@@ -120,7 +116,7 @@ def prepare_upload(
         )
     tokenizer = AutoTokenizer.from_pretrained(data_encoder_path)
     tokenizer.save_pretrained(save_dir)
-    model_config = AutoConfig.from_pretrained(config.pretrained_model_name)
+    model_config = AutoConfig.from_pretrained(model_path)
     model_config._name_or_path = (
         f"{config.user_name}/{config.model_type}-{config.upload_tag}"
     )
