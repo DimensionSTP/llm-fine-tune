@@ -100,7 +100,8 @@ pred_name: ${save_detail}-epoch=${epoch}
 submission_name: ${save_detail}-epoch=${epoch}
 
 user_name: ${oc.env:USER_NAME}
-upload_tag: LLMKorean
+upload_tag: Open-Ko
+model_detail: llama-3.1-8B-instruct
 num_safetensors: 10
 
 korean_model_name: beomi/OPEN-SOLAR-KO-10.7B
