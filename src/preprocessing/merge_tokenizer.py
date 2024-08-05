@@ -34,10 +34,12 @@ def merge_tokenizer(
 
     korean_tokenizer_tokens = korean_tokenizer.get_vocab().keys()
     korean_tokens = [token for token in korean_tokenizer_tokens if is_korean(token)]
-    korean_tokens = korean_tokens[: config.add_vocab_size]
 
     tokenizer_tokens = tokenizer.get_vocab().keys()
     new_tokens = [token for token in korean_tokens if token not in tokenizer_tokens]
+    new_tokens_length = len(new_tokens)
+    max_multiple_of_128 = (new_tokens_length // 128) * 128
+    new_tokens = new_tokens[:max_multiple_of_128]
     tokenizer.add_tokens(new_tokens)
 
     if not os.path.exists(config.custom_data_encoder_path):
