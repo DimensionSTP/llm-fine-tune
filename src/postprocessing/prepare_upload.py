@@ -118,11 +118,11 @@ def prepare_upload(
     tokenizer.save_pretrained(save_dir)
     model_config = AutoConfig.from_pretrained(model_path)
     model_config._name_or_path = (
-        f"{config.user_name}/{config.model_type}-{config.upload_tag}"
+        f"{config.user_name}/{config.upload_tag}-{config.model_detail}"
     )
     model_config.torch_dtype = torch_dtype
     if config.is_preprocessed:
-        model_config.vocab_size = tokenizer.vocab_size
+        model_config.vocab_size = len(tokenizer)
     model_config.save_pretrained(save_dir)
 
 
