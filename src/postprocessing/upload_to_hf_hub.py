@@ -22,7 +22,7 @@ def upload_to_hf_hub(
     token = HfFolder.get_token()
     api.upload_folder(
         folder_path=save_dir,
-        repo_id=f"{config.user_name}/{config.model_type}-{config.upload_tag}",
+        repo_id=f"{config.user_name}/{config.upload_tag}-{config.model_detail}",
         repo_type="model",
         token=token,
     )
