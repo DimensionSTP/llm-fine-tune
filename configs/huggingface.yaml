@@ -78,7 +78,7 @@ gradient_clip_algorithm: norm
 epoch: 100
 
 model_name: HuggingFace
-dataset_name: Open-Ko
+dataset_name: open-Korean
 mode: train
 
 is_tuned: tuned
@@ -100,8 +100,8 @@ pred_name: ${save_detail}-epoch=${epoch}
 submission_name: ${save_detail}-epoch=${epoch}
 
 user_name: ${oc.env:USER_NAME}
-upload_tag: Open-Ko
-model_detail: llama-3.1-8B-instruct
+upload_tag: open-Korean
+model_detail: Llama-3.1-8B-Instruct
 num_safetensors: 10
 
 korean_model_name: beomi/OPEN-SOLAR-KO-10.7B
