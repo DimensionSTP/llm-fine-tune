@@ -14,7 +14,7 @@ target_max_length=384
 precision="bf16"
 batch_size=32
 epoch=2
-model_detail="llama-3.1-8B-instruct"
+model_detail="Llama-3.1-8B-Instruct"
 
 python $path/prepare_upload.py \
     is_preprocessed=$is_preprocessed \
