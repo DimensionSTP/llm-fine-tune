@@ -10,9 +10,9 @@ hparams:
     low: 0.001
     high: 0.01
     log: False
-  half_period:
-    low: 1
-    high: 10
+  warmup_rate:
+    low: 0.01
+    high: 0.1
     log: False
   eta_min_rate:
     low: 0.05
