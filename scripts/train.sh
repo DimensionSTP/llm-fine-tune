@@ -1,6 +1,6 @@
 #!/bin/bash
 
-is_preprocessed=True
+is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
 upload_user="meta-llama"
