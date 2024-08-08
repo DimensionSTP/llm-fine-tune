@@ -23,7 +23,7 @@ split:
 batch_size: 32
 
 split_ratio: 0.1
-is_preprocessed: True
+is_preprocessed: False
 system_prompt_column_name: system_prompt
 data_column_name: instruction
 target_column_name: output
@@ -53,9 +53,9 @@ peft_config:
   task_type: CAUSAL_LM
   inference_mode: False
 
-lr: 0.0001
+lr: 0.00005
 weight_decay: 0.01
-half_period: 1
+warmup_rate: 0.05
 eta_min_rate: 0.1
 options:
   return_dict_in_generate: True
@@ -75,7 +75,7 @@ precision: bf16
 accumulate_grad_batches: 4
 gradient_clip_val: 1
 gradient_clip_algorithm: norm
-epoch: 100
+epoch: 5
 
 model_name: HuggingFace
 dataset_name: open-Korean
