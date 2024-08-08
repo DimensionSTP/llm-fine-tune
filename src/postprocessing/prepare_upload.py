@@ -76,6 +76,9 @@ def prepare_upload(
             model_path = config.merged_model_path
         else:
             model_path = config.pretrained_model_name
+    else:
+        data_encoder_path = config.pretrained_model_name
+        model_path = config.pretrained_model_name
 
     tokenizer = AutoTokenizer.from_pretrained(data_encoder_path)
     tokenizer.save_pretrained(save_dir)
