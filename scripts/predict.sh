@@ -8,11 +8,11 @@ model_type="Meta-Llama-3.1-8B-Instruct"
 left_padding=False
 quantization_type="origin"
 peft_type="origin"
-data_max_length=384
-target_max_length=384
+data_max_length=512
+target_max_length=512
 precision="bf16"
-batch_size=32
-epochs="3 4"
+batch_size=24
+epochs="2 4"
 
 for epoch in $epochs
 do
