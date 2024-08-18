@@ -13,12 +13,14 @@
 *.ipynb
 *.tar
 *.tar.gz
+*.log
 *__pycache__
 logs/runs/
 logs/wandb/
 multirun/
 data/
 baseline/
+/wandb
 tmp*
 !requirements.txt
 !packages.txt
