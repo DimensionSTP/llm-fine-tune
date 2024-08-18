@@ -1,7 +1,7 @@
 _target_: src.tuners.huggingface_tuner.HuggingFaceTuner
 hparams:
   pretrained_model_name:
-    - beomi/OPEN-SOLAR-KO-10.7B
+    - meta-llama/Meta-Llama-3.1-8B-Instruct
   lr:
     low: 5e-5
     high: 5e-4
@@ -22,6 +22,7 @@ hparams:
 module_params:
   is_preprocessed: ${is_preprocessed}
   custom_data_encoder_path: ${custom_data_encoder_path}
+  left_padding: ${left_padding}
   merged_model_path: ${merged_model_path}
   model_execution_mode: ${mode}
   quantization_type: ${quantization_type}
