@@ -12,6 +12,8 @@ data_max_length=512
 target_max_length=512
 precision="bf16"
 batch_size=24
+lr=1e-4
+accumulate_grad_batches=4
 
 python main.py mode=train \
     is_preprocessed=$is_preprocessed \
@@ -25,4 +27,6 @@ python main.py mode=train \
     data_max_length=$data_max_length \
     target_max_length=$target_max_length \
     precision=$precision \
-    batch_size=$batch_size
+    batch_size=$batch_size \
+    lr=$lr \
+    accumulate_grad_batches=$accumulate_grad_batches

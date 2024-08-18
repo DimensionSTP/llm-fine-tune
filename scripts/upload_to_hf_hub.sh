@@ -13,6 +13,8 @@ data_max_length=512
 target_max_length=512
 precision="bf16"
 batch_size=24
+lr=1e-4
+accumulate_grad_batches=4
 epoch=2
 model_detail="Llama-3.1-8B-Instruct"
 
@@ -29,5 +31,7 @@ python $path/upload_to_hf_hub.py \
     target_max_length=$target_max_length \
     precision=$precision \
     batch_size=$batch_size \
+    lr=$lr \
+    accumulate_grad_batches=$accumulate_grad_batches \
     epoch=$epoch \
     model_detail=$model_detail
