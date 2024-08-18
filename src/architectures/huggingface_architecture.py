@@ -123,7 +123,7 @@ class HuggingFaceArchitecture(LightningModule):
                 lr=self.lr,
                 weight_decay=self.weight_decay,
             )
-        total_steps = self.trainer.estimated_stepping_batches * self.trainer.max_epochs
+        total_steps = self.trainer.estimated_stepping_batches
         warmup_steps = int(total_steps * self.warmup_rate)
         t_max = total_steps - warmup_steps
         eta_min = self.lr * self.eta_min_rate
