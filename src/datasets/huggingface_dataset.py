@@ -17,7 +17,7 @@ class LLMKoreanDataset(Dataset):
         split_ratio: float,
         seed: int,
         is_preprocessed: bool,
-        system_prompt_column_name: str,
+        instruction_column_name: str,
         data_column_name: str,
         target_column_name: str,
         num_devices: int,
@@ -33,7 +33,7 @@ class LLMKoreanDataset(Dataset):
         self.split_ratio = split_ratio
         self.seed = seed
         self.is_preprocessed = is_preprocessed
-        self.system_prompt_column_name = system_prompt_column_name
+        self.instruction_column_name = instruction_column_name
         self.data_column_name = data_column_name
         self.target_column_name = target_column_name
         self.num_devices = num_devices
@@ -52,7 +52,7 @@ class LLMKoreanDataset(Dataset):
         if left_padding:
             self.data_encoder.padding_side = "left"
         dataset = self.get_dataset()
-        self.system_prompts = dataset["system_prompts"]
+        self.instructions = dataset["instructions"]
         self.datas = dataset["datas"]
         self.labels = dataset["labels"]
         self.data_max_length = data_max_length
@@ -66,7 +66,7 @@ class LLMKoreanDataset(Dataset):
         idx: int,
     ) -> Dict[str, Any]:
         prompt = self.generate_prompt(
-            system_prompt=self.system_prompts[idx],
+            instruction=self.instructions[idx],
             data=self.datas[idx],
             label=self.labels[idx],
         )
@@ -124,13 +124,13 @@ class LLMKoreanDataset(Dataset):
                     )
         else:
             raise ValueError(f"Inavalid split: {self.split}")
-        system_prompts = (
-            data[self.system_prompt_column_name].apply(lambda x: x.strip()).tolist()
+        instructions = (
+            data[self.instruction_column_name].apply(lambda x: x.strip()).tolist()
         )
         datas = data[self.data_column_name].apply(lambda x: x.strip()).tolist()
         labels = data[self.target_column_name].apply(lambda x: x.strip()).tolist()
         return {
-            "system_prompts": system_prompts,
+            "instructions": instructions,
             "datas": datas,
             "labels": labels,
         }
@@ -162,26 +162,26 @@ class LLMKoreanDataset(Dataset):
 
     def generate_prompt(
         self,
-        system_prompt: str,
+        instruction: str,
         data: str,
         label: str,
     ) -> str:
         if self.split == "predict":
-            prompt = f"""### System prompt:
-{system_prompt} 
+            prompt = f"""### Instruction:
+{instruction} 
 
-### Instruction:
+### Input:
 {data.strip()}
 
-### Output:
+### Response:
 """.strip()
         else:
-            prompt = f"""### System prompt:
-{system_prompt} 
+            prompt = f"""### Instruction:
+{instruction} 
 
-### Instruction:
+### Input:
 {data.strip()}
 
-### Output:
+### Response:
 {label} """.strip()
         return prompt

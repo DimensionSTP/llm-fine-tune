@@ -4,7 +4,7 @@ split: ${split.train}
 split_ratio: ${split_ratio}
 seed: ${seed}
 is_preprocessed: ${is_preprocessed}
-system_prompt_column_name: ${system_prompt_column_name}
+instruction_column_name: ${instruction_column_name}
 data_column_name: ${data_column_name}
 target_column_name: ${target_column_name}
 num_devices: ${devices}
