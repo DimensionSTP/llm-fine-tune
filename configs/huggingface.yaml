@@ -22,7 +22,7 @@ split:
 
 batch_size: 24
 
-split_ratio: 0.1
+split_ratio: 1e-4
 is_preprocessed: False
 instruction_column_name: instruction
 data_column_name: input
@@ -60,7 +60,6 @@ eta_min_rate: 1e-2
 options:
   return_dict_in_generate: True
   output_scores: True
-  no_repeat_ngram_size: 2
 
 monitor: val_loss
 tracking_direction: min
