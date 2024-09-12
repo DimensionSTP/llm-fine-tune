@@ -36,6 +36,7 @@ def train(
                 logged_hparams[key] = value
     logged_hparams["batch_size"] = config.batch_size
     logged_hparams["epoch"] = config.epoch
+    logged_hparams["step"] = config.step
     logged_hparams["seed"] = config.seed
     for key, value in config.trainer.items():
         if key != "_target_":
@@ -92,15 +93,17 @@ def train(
         raise e
 
     if config.strategy.startswith("deepspeed"):
-        for epoch in range(config.epoch):
-            ckpt_path = (
-                f"{config.callbacks.model_checkpoint.dirpath}/epoch={epoch}.ckpt"
-            )
-            if os.path.exists(ckpt_path) and os.path.isdir(ckpt_path):
-                convert_zero_checkpoint_to_fp32_state_dict(
-                    ckpt_path,
-                    f"{ckpt_path}/model.pt",
-                )
+        for root, dirs, _ in os.walk(config.callbacks.model_checkpoint.dirpath):
+            for dir_name in dirs:
+                if dir_name.endswith(".ckpt"):
+                    ckpt_path = os.path.join(
+                        root,
+                        dir_name,
+                    )
+                    convert_zero_checkpoint_to_fp32_state_dict(
+                        ckpt_path,
+                        f"{ckpt_path}/model.pt",
+                    )
 
 
 def test(
@@ -126,6 +129,7 @@ def test(
                 logged_hparams[key] = value
     logged_hparams["batch_size"] = config.batch_size
     logged_hparams["epoch"] = config.epoch
+    logged_hparams["step"] = config.step
     logged_hparams["seed"] = config.seed
     for key, value in config.trainer.items():
         if key != "_target_":
@@ -212,6 +216,7 @@ def predict(
                 logged_hparams[key] = value
     logged_hparams["batch_size"] = config.batch_size
     logged_hparams["epoch"] = config.epoch
+    logged_hparams["step"] = config.step
     logged_hparams["seed"] = config.seed
     for key, value in config.trainer.items():
         if key != "_target_":
