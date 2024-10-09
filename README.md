@@ -9,8 +9,8 @@ HuggingFace Korean dataset(preprocessed as system_prompt, instruction, and outpu
 
 ```bash
 # clone project
-git clone https://github.com/DimensionSTP/llm-korean-fine-tune.git
-cd llm-korean-fine-tune
+git clone https://github.com/DimensionSTP/llm-fine-tune.git
+cd llm-fine-tune
 
 # [OPTIONAL] create conda environment
 conda create -n myenv python=3.8
@@ -104,7 +104,7 @@ upload_user={upload_user}
 model_type={model_type}
 ```
 
-* Set data and target max lengt for model training and generation
+* Set data and target max length for model training and generation
 ```shell
 data_max_length={data_max_length} 
 target_max_length={target_max_length} 
