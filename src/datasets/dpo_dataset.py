@@ -1,0 +1,217 @@
+from typing import Dict, Any, List
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+import torch
+from torch.utils.data import Dataset
+
+from transformers import AutoTokenizer
+
+
+class StructuralDataset(Dataset):
+    def __init__(
+        self,
+        data_path: str,
+        split: str,
+        split_ratio: float,
+        seed: int,
+        is_preprocessed: bool,
+        instruction_column_name: str,
+        data_column_name: str,
+        target_a_column_name: str,
+        target_b_column_name: str,
+        preference_column_name: str,
+        num_devices: int,
+        batch_size: int,
+        pretrained_model_name: str,
+        custom_data_encoder_path: str,
+        left_padding: bool,
+        data_max_length: int,
+        target_max_length: int,
+    ) -> None:
+        self.data_path = data_path
+        self.split = split
+        self.split_ratio = split_ratio
+        self.seed = seed
+        self.is_preprocessed = is_preprocessed
+        self.instruction_column_name = instruction_column_name
+        self.data_column_name = data_column_name
+        self.target_a_column_name = target_a_column_name
+        self.target_b_column_name = target_b_column_name
+        self.preference_column_name = preference_column_name
+        self.num_devices = num_devices
+        self.batch_size = batch_size
+        self.pretrained_model_name = pretrained_model_name
+        if is_preprocessed:
+            data_encoder_path = custom_data_encoder_path
+        else:
+            data_encoder_path = self.pretrained_model_name
+        self.data_encoder = AutoTokenizer.from_pretrained(
+            data_encoder_path,
+            use_fast=True,
+        )
+        if self.data_encoder.pad_token_id is None:
+            self.data_encoder.pad_token_id = self.data_encoder.eos_token_id
+        if left_padding:
+            self.data_encoder.padding_side = "left"
+        else:
+            self.data_encoder.padding_side = "right"
+        dataset = self.get_dataset()
+        self.instructions = dataset["instructions"]
+        self.datas = dataset["datas"]
+        self.label_as = dataset["label_as"]
+        self.label_bs = dataset["label_bs"]
+        self.preferences = dataset["preferences"]
+        self.data_max_length = data_max_length
+        self.target_max_length = target_max_length
+
+    def __len__(self) -> int:
+        return len(self.preferences)
+
+    def __getitem__(
+        self,
+        idx: int,
+    ) -> Dict[str, Any]:
+        prompt_a = self.generate_prompt(
+            instruction=self.instructions[idx],
+            data=self.datas[idx],
+            label=self.label_as[idx],
+        )
+        encoded_a = self.encode_text(
+            data=prompt_a,
+            data_type="data",
+        )
+        if "token_type_ids" in encoded_a.keys():
+            del encoded_a["token_type_ids"]
+
+        prompt_b = self.generate_prompt(
+            instruction=self.instructions[idx],
+            data=self.datas[idx],
+            label=self.label_bs[idx],
+        )
+        encoded_b = self.encode_text(
+            data=prompt_b,
+            data_type="data",
+        )
+        if "token_type_ids" in encoded_b.keys():
+            del encoded_b["token_type_ids"]
+
+        preference = self.preferences[idx]
+        return {
+            "encoded_a": encoded_a,
+            "encoded_b": encoded_b,
+            "preference": preference,
+            "index": idx,
+        }
+
+    def get_dataset(self) -> Dict[str, List[Any]]:
+        if self.split in ["train", "val"]:
+            parquet_path = f"{self.data_path}/train.parquet"
+            data = pd.read_parquet(parquet_path)
+            data = data.fillna("_")
+            train_data, val_data = train_test_split(
+                data,
+                test_size=self.split_ratio,
+                random_state=self.seed,
+                shuffle=True,
+            )
+            if self.split == "train":
+                data = train_data
+            else:
+                data = val_data
+        elif self.split == "test":
+            parquet_path = f"{self.data_path}/{self.split}.parquet"
+            data = pd.read_parquet(parquet_path)
+            data = data.fillna("_")
+        elif self.split == "predict":
+            parquet_path = f"{self.data_path}/test.parquet"
+            data = pd.read_parquet(parquet_path)
+            data = data.fillna("_")
+            if self.num_devices > 1:
+                last_row = data.iloc[-1]
+                total_batch_size = self.num_devices * self.batch_size
+                remainder = (len(data) % total_batch_size) % self.num_devices
+                if remainder != 0:
+                    num_dummies = self.num_devices - remainder
+                    repeated_rows = pd.DataFrame([last_row] * num_dummies)
+                    repeated_rows.reset_index(
+                        drop=True,
+                        inplace=True,
+                    )
+                    data = pd.concat(
+                        [
+                            data,
+                            repeated_rows,
+                        ],
+                        ignore_index=True,
+                    )
+        else:
+            raise ValueError(f"Inavalid split: {self.split}")
+        instructions = (
+            data[self.instruction_column_name].apply(lambda x: x.strip()).tolist()
+        )
+        datas = data[self.data_column_name].apply(lambda x: x.strip()).tolist()
+        label_as = data[self.target_a_column_name].apply(lambda x: x.strip()).tolist()
+        label_bs = data[self.target_b_column_name].apply(lambda x: x.strip()).tolist()
+        preferences = (
+            data[self.preference_column_name].apply(lambda x: x.strip()).tolist()
+        )
+        return {
+            "instructions": instructions,
+            "datas": datas,
+            "label_as": label_as,
+            "label_bs": label_bs,
+            "preferences": preferences,
+        }
+
+    def encode_text(
+        self,
+        data: str,
+        data_type: str,
+    ) -> Dict[str, torch.Tensor]:
+        if data_type == "data":
+            if self.split == "predict":
+                max_length = self.data_max_length
+            else:
+                max_length = self.data_max_length + self.target_max_length
+        elif data_type == "target":
+            max_length = self.target_max_length
+        else:
+            raise ValueError(f"Inavalid data_type: {data_type}")
+        encoded = self.data_encoder(
+            data,
+            padding="max_length",
+            max_length=max_length,
+            truncation=True,
+            return_tensors="pt",
+            add_special_tokens=True,
+        )
+        encoded = {k: v.squeeze(0) for k, v in encoded.items()}
+        return encoded
+
+    def generate_prompt(
+        self,
+        instruction: str,
+        data: str,
+        label: str,
+    ) -> str:
+        if self.split == "predict":
+            prompt = f"""### Instruction:
+{instruction} 
+
+### Input:
+{data.strip()}
+
+### Response:
+""".strip()
+        else:
+            prompt = f"""### Instruction:
+{instruction} 
+
+### Input:
+{data.strip()}
+
+### Response:
+{label} """.strip()
+        return prompt
