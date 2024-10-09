@@ -13,7 +13,7 @@ from deepspeed.ops.adam import FusedAdam, DeepSpeedCPUAdam
 from transformers import AutoTokenizer
 
 
-class HuggingFaceArchitecture(LightningModule):
+class CausalLMArchitecture(LightningModule):
     def __init__(
         self,
         model: nn.Module,

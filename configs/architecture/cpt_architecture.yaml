@@ -1,4 +1,4 @@
-_target_: src.architectures.huggingface_architecture.HuggingFaceArchitecture
+_target_: src.architectures.cpt_architecture.CausalLMArchitecture
 
 model:
   _target_: src.architectures.models.huggingface_model.HuggingFaceModel
