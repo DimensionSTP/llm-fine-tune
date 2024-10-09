@@ -1,4 +1,4 @@
-_target_: src.tuners.huggingface_tuner.HuggingFaceTuner
+_target_: src.tuners.cpt_tuner.CausalLMTuner
 hparams:
   pretrained_model_name:
     - meta-llama/Meta-Llama-3.1-8B-Instruct

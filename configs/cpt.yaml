@@ -2,7 +2,7 @@
 defaults:
   - dataset: cpt_structural_dataset
   - architecture: cpt_architecture
-  - tuner: huggingface_tuner
+  - tuner: cpt_tuner
   - logger: wandb
   - hydra: hydra
   - callbacks: callbacks

@@ -9,7 +9,7 @@ from lightning.pytorch.utilities.deepspeed import (
 )
 
 from ..utils.setup import SetUp
-from ..tuners.huggingface_tuner import HuggingFaceTuner
+from ..tuners.cpt_tuner import CausalLMTuner
 
 
 def train(
@@ -292,7 +292,7 @@ def tune(
     val_loader = setup.get_val_loader()
     logger = setup.get_wandb_logger()
 
-    tuner: HuggingFaceTuner = instantiate(
+    tuner: CausalLMTuner = instantiate(
         config.tuner,
         train_loader=train_loader,
         val_loader=val_loader,

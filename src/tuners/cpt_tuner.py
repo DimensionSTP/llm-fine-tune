@@ -16,10 +16,10 @@ from transformers import BitsAndBytesConfig
 from peft import LoraConfig
 
 from ..architectures.models.huggingface_model import HuggingFaceModel
-from ..architectures.huggingface_architecture import HuggingFaceArchitecture
+from ..architectures.cpt_architecture import CausalLMArchitecture
 
 
-class HuggingFaceTuner:
+class CausalLMTuner:
     def __init__(
         self,
         hparams: Dict[str, Any],
@@ -127,7 +127,7 @@ class HuggingFaceTuner:
             peft_type=self.module_params.peft_type,
             peft_config=LoraConfig(**self.module_params.peft_config),
         )
-        architecture = HuggingFaceArchitecture(
+        architecture = CausalLMArchitecture(
             model=model,
             pretrained_model_name=params["pretrained_model_name"],
             is_preprocessed=self.module_params.is_preprocessed,
