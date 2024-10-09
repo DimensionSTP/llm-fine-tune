@@ -22,7 +22,7 @@ from src.pipelines.pipeline import train, test, predict, tune
 
 @hydra.main(
     config_path="configs/",
-    config_name="huggingface.yaml",
+    config_name="cpt.yaml",
 )
 def main(
     config: DictConfig,
