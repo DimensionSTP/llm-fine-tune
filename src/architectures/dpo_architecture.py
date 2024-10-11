@@ -84,35 +84,29 @@ class CausalLMArchitecture(LightningModule):
         batch: Dict[str, Any],
         mode: str,
     ) -> Dict[str, torch.Tensor]:
-        encoded_a = batch["encoded_a"]
-        encoded_a["labels"] = encoded_a["input_ids"]
+        encoded_choice = batch["encoded_choice"]
+        encoded_choice["labels"] = encoded_choice["input_ids"]
 
-        encoded_b = batch["encoded_b"]
-        encoded_b["labels"] = encoded_b["input_ids"]
+        encoded_rejection = batch["encoded_rejection"]
+        encoded_rejection["labels"] = encoded_rejection["input_ids"]
 
-        label = batch["preference"]
+        label = encoded_choice["labels"]
         index = batch["index"]
 
-        output_a = self(
-            encoded_a=encoded_a,
+        chosen_output = self(
+            encoded=encoded_choice,
             mode=mode,
         )
-        output_b = self(
-            encoded_b=encoded_b,
+        rejected_output = self(
+            encoded=encoded_rejection,
             mode=mode,
         )
 
-        if label == 0:
-            preferred_logits = output_a.logits
-            dispreferred_logits = output_b.logits
-        elif label == 1:
-            preferred_logits = output_b.logits
-            dispreferred_logits = output_a.logits
-        else:
-            raise ValueError(f"Invalid label: {label}")
+        chosen_logit = chosen_output.logits
+        rejected_logit = rejected_output.logits
 
-        preference_score = (preferred_logits - dispreferred_logits) / self.dpo_beta
-        logit = preferred_logits
+        preference_score = (chosen_logit - rejected_logit) / self.dpo_beta
+        logit = chosen_logit
         pred = torch.argmax(
             logit,
             dim=-1,
@@ -268,7 +262,7 @@ class CausalLMArchitecture(LightningModule):
         batch: Dict[str, Any],
         batch_idx: int,
     ) -> torch.Tensor:
-        encoded = batch["encoded_a"]
+        encoded = batch["encoded_choice"]
         index = batch["index"]
         device_num = self.device.index if self.device.index is not None else 0
 
