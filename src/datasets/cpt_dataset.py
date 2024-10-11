@@ -173,7 +173,7 @@ class StructuralDataset(Dataset):
 {instruction} 
 
 ### Input:
-{data.strip()}
+{data}
 
 ### Response:
 """.strip()
@@ -182,7 +182,7 @@ class StructuralDataset(Dataset):
 {instruction} 
 
 ### Input:
-{data.strip()}
+{data}
 
 ### Response:
 {label} """.strip()
