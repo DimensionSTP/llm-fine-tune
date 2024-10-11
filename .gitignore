@@ -19,6 +19,7 @@ logs/runs/
 logs/wandb/
 multirun/
 data/
+dpo_data/
 baseline/
 /wandb
 tmp*
