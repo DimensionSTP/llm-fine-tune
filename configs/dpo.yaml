@@ -26,9 +26,8 @@ split_ratio: 1e-2
 is_preprocessed: False
 instruction_column_name: instruction
 data_column_name: input
-target_a_column_name: response_a
-target_b_column_name: response_b
-preference_column_name: preference
+chosen_column_name: chosen
+rejected_column_name: rejected
 upload_user: meta-llama
 model_type: Meta-Llama-3.1-8B-Instruct
 pretrained_model_name: ${upload_user}/${model_type}
