@@ -19,9 +19,8 @@ class StructuralDataset(Dataset):
         is_preprocessed: bool,
         instruction_column_name: str,
         data_column_name: str,
-        target_a_column_name: str,
-        target_b_column_name: str,
-        preference_column_name: str,
+        chosen_column_name: str,
+        rejected_column_name: str,
         num_devices: int,
         batch_size: int,
         pretrained_model_name: str,
@@ -37,9 +36,8 @@ class StructuralDataset(Dataset):
         self.is_preprocessed = is_preprocessed
         self.instruction_column_name = instruction_column_name
         self.data_column_name = data_column_name
-        self.target_a_column_name = target_a_column_name
-        self.target_b_column_name = target_b_column_name
-        self.preference_column_name = preference_column_name
+        self.chosen_column_name = chosen_column_name
+        self.rejected_column_name = rejected_column_name
         self.num_devices = num_devices
         self.batch_size = batch_size
         self.pretrained_model_name = pretrained_model_name
@@ -60,48 +58,44 @@ class StructuralDataset(Dataset):
         dataset = self.get_dataset()
         self.instructions = dataset["instructions"]
         self.datas = dataset["datas"]
-        self.label_as = dataset["label_as"]
-        self.label_bs = dataset["label_bs"]
-        self.preferences = dataset["preferences"]
+        self.choices = dataset["choices"]
+        self.rejections = dataset["rejections"]
         self.data_max_length = data_max_length
         self.target_max_length = target_max_length
 
     def __len__(self) -> int:
-        return len(self.preferences)
+        return len(self.datas)
 
     def __getitem__(
         self,
         idx: int,
     ) -> Dict[str, Any]:
-        prompt_a = self.generate_prompt(
+        prompt_choice = self.generate_prompt(
             instruction=self.instructions[idx],
             data=self.datas[idx],
-            label=self.label_as[idx],
+            label=self.choices[idx],
         )
-        encoded_a = self.encode_text(
-            data=prompt_a,
+        encoded_choice = self.encode_text(
+            data=prompt_choice,
             data_type="data",
         )
-        if "token_type_ids" in encoded_a.keys():
-            del encoded_a["token_type_ids"]
+        if "token_type_ids" in encoded_choice.keys():
+            del encoded_choice["token_type_ids"]
 
-        prompt_b = self.generate_prompt(
+        prompt_rejection = self.generate_prompt(
             instruction=self.instructions[idx],
             data=self.datas[idx],
-            label=self.label_bs[idx],
+            label=self.rejections[idx],
         )
-        encoded_b = self.encode_text(
-            data=prompt_b,
+        encoded_rejection = self.encode_text(
+            data=prompt_rejection,
             data_type="data",
         )
-        if "token_type_ids" in encoded_b.keys():
-            del encoded_b["token_type_ids"]
-
-        preference = self.preferences[idx]
+        if "token_type_ids" in encoded_rejection.keys():
+            del encoded_rejection["token_type_ids"]
         return {
-            "encoded_a": encoded_a,
-            "encoded_b": encoded_b,
-            "preference": preference,
+            "encoded_choice": encoded_choice,
+            "encoded_rejection": encoded_rejection,
             "index": idx,
         }
 
@@ -152,17 +146,13 @@ class StructuralDataset(Dataset):
             data[self.instruction_column_name].apply(lambda x: x.strip()).tolist()
         )
         datas = data[self.data_column_name].apply(lambda x: x.strip()).tolist()
-        label_as = data[self.target_a_column_name].apply(lambda x: x.strip()).tolist()
-        label_bs = data[self.target_b_column_name].apply(lambda x: x.strip()).tolist()
-        preferences = (
-            data[self.preference_column_name].apply(lambda x: x.strip()).tolist()
-        )
+        choices = data[self.chosen_column_name].apply(lambda x: x.strip()).tolist()
+        rejections = data[self.rejected_column_name].apply(lambda x: x.strip()).tolist()
         return {
             "instructions": instructions,
             "datas": datas,
-            "label_as": label_as,
-            "label_bs": label_bs,
-            "preferences": preferences,
+            "choices": choices,
+            "rejections": rejections,
         }
 
     def encode_text(
@@ -201,7 +191,7 @@ class StructuralDataset(Dataset):
 {instruction} 
 
 ### Input:
-{data.strip()}
+{data}
 
 ### Response:
 """.strip()
@@ -210,7 +200,7 @@ class StructuralDataset(Dataset):
 {instruction} 
 
 ### Input:
-{data.strip()}
+{data}
 
 ### Response:
 {label} """.strip()
