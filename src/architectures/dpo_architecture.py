@@ -499,3 +499,12 @@ class CausalLMArchitecture(LightningModule):
 
     def on_test_epoch_end(self) -> None:
         pass
+
+    def on_save_checkpoint(
+        self,
+        checkpoint: Dict[str, Any],
+    ) -> None:
+        checkpoint.pop(
+            "reference_model",
+            None,
+        )
