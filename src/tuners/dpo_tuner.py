@@ -151,7 +151,7 @@ class CausalLMTuner:
             target_max_length=self.module_params.target_max_length,
             target_min_length=self.module_params.target_min_length,
             per_device_save_path=self.module_params.per_device_save_path,
-            target_column_name=self.module_params.target_column_name,
+            chosen_column_name=self.module_params.chosen_column_name,
         )
 
         self.logger.log_hyperparams(params)
