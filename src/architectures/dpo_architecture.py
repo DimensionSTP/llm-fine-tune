@@ -1,4 +1,5 @@
 from typing import Dict, Any
+import copy
 import os
 
 import pandas as pd
@@ -33,10 +34,11 @@ class CausalLMArchitecture(LightningModule):
         target_max_length: int,
         target_min_length: int,
         per_device_save_path: str,
-        target_column_name: str,
+        chosen_column_name: str,
     ) -> None:
         super().__init__()
         self.model = model
+        self.reference_model = copy.deepcopy(model)
         self.pretrained_model_name = pretrained_model_name
         if is_preprocessed:
             data_encoder_path = custom_data_encoder_path
@@ -63,20 +65,21 @@ class CausalLMArchitecture(LightningModule):
         self.target_max_length = target_max_length
         self.target_min_length = target_min_length
         self.per_device_save_path = per_device_save_path
-        self.target_column_name = target_column_name
+        self.chosen_column_name = chosen_column_name
 
     def forward(
         self,
         encoded: Dict[str, torch.Tensor],
+        model: nn.Module,
         mode: str,
     ) -> Dict[str, torch.Tensor]:
         if mode == "train":
-            self.model.train()
+            model.train()
         elif mode == "eval":
-            self.model.eval()
+            model.eval()
         else:
             raise ValueError(f"Invalid model mode: {mode}")
-        output = self.model(encoded)
+        output = model(encoded)
         return output
 
     def step(
@@ -93,28 +96,91 @@ class CausalLMArchitecture(LightningModule):
         label = encoded_choice["labels"]
         index = batch["index"]
 
-        chosen_output = self(
+        chosen_model_output = self(
             encoded=encoded_choice,
+            model=self.model,
             mode=mode,
         )
-        rejected_output = self(
+        rejected_model_output = self(
             encoded=encoded_rejection,
+            model=self.model,
             mode=mode,
         )
+        chosen_reference_output = self(
+            encoded=encoded_choice,
+            model=self.reference_model,
+            mode="eval",
+        )
+        rejected_reference_output = self(
+            encoded=encoded_rejection,
+            model=self.reference_model,
+            mode="eval",
+        )
 
-        chosen_logit = chosen_output.logits
-        rejected_logit = rejected_output.logits
+        chosen_model_logit = chosen_model_output.logits
+        rejected_model_logit = rejected_model_output.logits
+        chosen_reference_logit = chosen_reference_output.logits
+        rejected_reference_logit = rejected_reference_output.logits
 
-        preference_score = (chosen_logit - rejected_logit) / self.dpo_beta
-        logit = chosen_logit
-        pred = torch.argmax(
-            logit,
+        chosen_model_log_prob = F.log_softmax(
+            chosen_model_logit,
             dim=-1,
         )
-        loss = -F.logsigmoid(preference_score).mean()
+        rejected_model_log_prob = F.log_softmax(
+            rejected_model_logit,
+            dim=-1,
+        )
+        chosen_reference_log_prob = F.log_softmax(
+            chosen_reference_logit,
+            dim=-1,
+        )
+        rejected_reference_log_prob = F.log_softmax(
+            rejected_reference_logit,
+            dim=-1,
+        )
+
+        prefered_relative_log_prob = chosen_model_log_prob - chosen_reference_log_prob
+        disprefered_relative_log_prob = (
+            rejected_model_log_prob - rejected_reference_log_prob
+        )
+
+        loss = -F.logsigmoid(
+            (prefered_relative_log_prob - disprefered_relative_log_prob) * self.dpo_beta
+        ).mean(
+            dim=-1,
+        )
+
+        prefered_relative_log_probability = prefered_relative_log_prob.mean(
+            dim=-1,
+        )
+        disprefered_relative_log_probability = disprefered_relative_log_prob.mean(
+            dim=-1,
+        )
+
+        reward_accuracy = (
+            (prefered_relative_log_prob > disprefered_relative_log_prob)
+            .float()
+            .mean(
+                dim=-1,
+            )
+        )
+        reward_margin = (
+            prefered_relative_log_prob - disprefered_relative_log_prob
+        ).mean(
+            dim=-1,
+        )
+
+        pred = torch.argmax(
+            chosen_model_logit,
+            dim=-1,
+        )
         return {
             "loss": loss,
-            "logit": logit,
+            "prefered_relative_log_probability": prefered_relative_log_probability,
+            "disprefered_relative_log_probability": disprefered_relative_log_probability,
+            "reward_accuracy": reward_accuracy,
+            "reward_margin": reward_margin,
+            "logit": chosen_model_logit,
             "pred": pred,
             "label": label,
             "index": index,
@@ -189,11 +255,49 @@ class CausalLMArchitecture(LightningModule):
             mode="train",
         )
         loss = output["loss"]
+        prefered_relative_log_probability = output["prefered_relative_log_probability"]
+        disprefered_relative_log_probability = output[
+            "disprefered_relative_log_probability"
+        ]
+        reward_accuracy = output["reward_accuracy"]
+        reward_margin = output["reward_margin"]
         pred = output["pred"]
         label = output["label"]
         self.log(
             "train_loss",
             loss,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log(
+            "train_prefered_relative_log_probability",
+            prefered_relative_log_probability,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log(
+            "train_disprefered_relative_log_probability",
+            disprefered_relative_log_probability,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log(
+            "train_reward_accuracy",
+            reward_accuracy,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log(
+            "train_reward_margin",
+            reward_margin,
             on_step=False,
             on_epoch=True,
             prog_bar=False,
@@ -215,11 +319,49 @@ class CausalLMArchitecture(LightningModule):
             mode="eval",
         )
         loss = output["loss"]
+        prefered_relative_log_probability = output["prefered_relative_log_probability"]
+        disprefered_relative_log_probability = output[
+            "disprefered_relative_log_probability"
+        ]
+        reward_accuracy = output["reward_accuracy"]
+        reward_margin = output["reward_margin"]
         pred = output["pred"]
         label = output["label"]
         self.log(
             "val_loss",
             loss,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log(
+            "val_prefered_relative_log_probability",
+            prefered_relative_log_probability,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log(
+            "val_disprefered_relative_log_probability",
+            disprefered_relative_log_probability,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log(
+            "val_reward_accuracy",
+            reward_accuracy,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log(
+            "val_reward_margin",
+            reward_margin,
             on_step=False,
             on_epoch=True,
             prog_bar=False,
@@ -241,11 +383,49 @@ class CausalLMArchitecture(LightningModule):
             mode="eval",
         )
         loss = output["loss"]
+        prefered_relative_log_probability = output["prefered_relative_log_probability"]
+        disprefered_relative_log_probability = output[
+            "disprefered_relative_log_probability"
+        ]
+        reward_accuracy = output["reward_accuracy"]
+        reward_margin = output["reward_margin"]
         pred = output["pred"]
         label = output["label"]
         self.log(
             "test_loss",
             loss,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log(
+            "test_prefered_relative_log_probability",
+            prefered_relative_log_probability,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log(
+            "test_disprefered_relative_log_probability",
+            disprefered_relative_log_probability,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log(
+            "test_reward_accuracy",
+            reward_accuracy,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=False,
+            sync_dist=True,
+        )
+        self.log(
+            "test_reward_margin",
+            reward_margin,
             on_step=False,
             on_epoch=True,
             prog_bar=False,
@@ -298,7 +478,7 @@ class CausalLMArchitecture(LightningModule):
         df = pd.DataFrame(
             {
                 "index": output.keys(),
-                self.target_column_name: output.values(),
+                self.chosen_column_name: output.values(),
             }
         )
         if not os.path.exists(generation_file):
