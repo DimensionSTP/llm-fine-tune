@@ -22,12 +22,12 @@ from omegaconf import DictConfig
 
 @hydra.main(
     config_path="../../configs/",
-    config_name="huggingface.yaml",
+    config_name="cpt.yaml",
 )
 def prepare_upload(
     config: DictConfig,
 ) -> None:
-    save_dir = f"{config.connected_dir}/prepare_upload/{config.model_detail}/epoch={config.epoch}"
+    save_dir = f"{config.connected_dir}/prepare_upload/{config.model_detail}/step={config.step}"
     if not os.path.exists(save_dir):
         os.makedirs(
             save_dir,

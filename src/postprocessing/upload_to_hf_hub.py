@@ -12,12 +12,12 @@ from omegaconf import DictConfig
 
 @hydra.main(
     config_path="../../configs/",
-    config_name="huggingface.yaml",
+    config_name="cpt.yaml",
 )
 def upload_to_hf_hub(
     config: DictConfig,
 ) -> None:
-    save_dir = f"{config.connected_dir}/prepare_upload/{config.model_detail}/epoch={config.epoch}"
+    save_dir = f"{config.connected_dir}/prepare_upload/{config.model_detail}/step={config.step}"
     api = HfApi()
     token = HfFolder.get_token()
     api.upload_folder(
