@@ -1,5 +1,6 @@
 #!/bin/bash
 
+split_ratio=1e-4
 is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
@@ -8,14 +9,20 @@ model_type="Meta-Llama-3.1-8B-Instruct"
 left_padding=False
 quantization_type="origin"
 peft_type="origin"
-data_max_length=512
-target_max_length=512
+data_max_length=1024
+target_max_length=1024
 precision="bf16"
-batch_size=24
-lr=1e-4
-accumulate_grad_batches=4
+batch_size=16
+accumulate_grad_batches=8
+lr=3e-5
+weight_decay=1e-1
+warmup_ratio=5e-2
+eta_min_ratio=1e-3
+epoch=4
+step=1e+4
 
 python main.py mode=train \
+    split_ratio=$split_ratio \
     is_preprocessed=$is_preprocessed \
     is_tuned=$is_tuned \
     strategy=$strategy \
@@ -28,5 +35,10 @@ python main.py mode=train \
     target_max_length=$target_max_length \
     precision=$precision \
     batch_size=$batch_size \
+    accumulate_grad_batches=$accumulate_grad_batches \
     lr=$lr \
-    accumulate_grad_batches=$accumulate_grad_batches
+    weight_decay=$weight_decay \
+    warmup_ratio=$warmup_ratio \
+    eta_min_ratio=$eta_min_ratio \
+    epoch=$epoch \
+    step=$step

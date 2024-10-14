@@ -8,15 +8,15 @@ model_type="Meta-Llama-3.1-8B-Instruct"
 left_padding=False
 quantization_type="origin"
 peft_type="origin"
-data_max_length=512
-target_max_length=512
+data_max_length=1024
+target_max_length=1024
 precision="bf16"
-batch_size=24
-lr=1e-4
-accumulate_grad_batches=4
-epochs="2 4"
+batch_size=16
+accumulate_grad_batches=8
+lr=3e-5
+steps="50000 60000"
 
-for epoch in $epochs
+for step in $steps
 do
     python main.py mode=predict \
         is_preprocessed=$is_preprocessed \
@@ -31,15 +31,14 @@ do
         target_max_length=$target_max_length \
         precision=$precision \
         batch_size=$batch_size \
-        lr=$lr \
         accumulate_grad_batches=$accumulate_grad_batches \
-        epoch=$epoch
+        lr=$lr \
+        step=$step
 done
 
-for epoch in $epochs
+for step in $steps
 do
     python merge_predictions.py \
-        is_causal=$is_causal \
         is_preprocessed=$is_preprocessed \
         is_tuned=$is_tuned \
         strategy=$strategy \
@@ -52,7 +51,7 @@ do
         target_max_length=$target_max_length \
         precision=$precision \
         batch_size=$batch_size \
-        lr=$lr \
         accumulate_grad_batches=$accumulate_grad_batches \
-        epoch=$epoch
+        lr=$lr \
+        step=$step
 done

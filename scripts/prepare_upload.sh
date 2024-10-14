@@ -9,13 +9,13 @@ model_type="Meta-Llama-3.1-8B-Instruct"
 left_padding=False
 quantization_type="origin"
 peft_type="origin"
-data_max_length=512
-target_max_length=512
+data_max_length=1024
+target_max_length=1024
 precision="bf16"
-batch_size=24
-lr=1e-4
-accumulate_grad_batches=4
-epoch=2
+batch_size=16
+accumulate_grad_batches=8
+lr=3e-5
+step=50000
 model_detail="Llama-3.1-8B-Instruct"
 
 python $path/prepare_upload.py \
@@ -31,7 +31,7 @@ python $path/prepare_upload.py \
     target_max_length=$target_max_length \
     precision=$precision \
     batch_size=$batch_size \
-    lr=$lr \
     accumulate_grad_batches=$accumulate_grad_batches \
-    epoch=$epoch \
+    lr=$lr \
+    step=$step \
     model_detail=$model_detail
