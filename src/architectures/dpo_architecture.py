@@ -39,6 +39,8 @@ class CausalLMArchitecture(LightningModule):
         super().__init__()
         self.model = model
         self.reference_model = copy.deepcopy(model)
+        for param in self.reference_model.parameters():
+            param.requires_grad = False
         self.pretrained_model_name = pretrained_model_name
         if is_preprocessed:
             data_encoder_path = custom_data_encoder_path
@@ -146,29 +148,17 @@ class CausalLMArchitecture(LightningModule):
 
         loss = -F.logsigmoid(
             (prefered_relative_log_prob - disprefered_relative_log_prob) * self.dpo_beta
-        ).mean(
-            dim=-1,
-        )
+        ).mean()
 
-        prefered_relative_log_probability = prefered_relative_log_prob.mean(
-            dim=-1,
-        )
-        disprefered_relative_log_probability = disprefered_relative_log_prob.mean(
-            dim=-1,
-        )
+        prefered_relative_log_probability = prefered_relative_log_prob.mean()
+        disprefered_relative_log_probability = disprefered_relative_log_prob.mean()
 
         reward_accuracy = (
-            (prefered_relative_log_prob > disprefered_relative_log_prob)
-            .float()
-            .mean(
-                dim=-1,
-            )
+            (prefered_relative_log_prob > disprefered_relative_log_prob).float().mean()
         )
         reward_margin = (
             prefered_relative_log_prob - disprefered_relative_log_prob
-        ).mean(
-            dim=-1,
-        )
+        ).mean()
 
         pred = torch.argmax(
             chosen_model_logit,
