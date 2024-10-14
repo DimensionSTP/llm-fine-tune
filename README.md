@@ -93,9 +93,19 @@ quantization_type={origin or quantization}
 peft_type={origin or lora}
 ```
 
-* for LLM fine-tuning in multi-GPU, recommended
+* for LLM full fine-tuning(Continued Pretraining) in multi-GPU, recommended
 ```shell
 strategy={deepspeed_stage_2 or deepspeed_stage_2_offload or deepspeed_stage_3 or deepspeed_stage_3_offload}
+```
+
+* for LLM DPO fine-tuning in multi-GPU, recommended
+```shell
+strategy={deepspeed_stage_2 or deepspeed_stage_2_offload}
+```
+
+* __for LLM DPO fine-tuning in multi-GPU, avoid using the following strategies to prevent errors!__
+```shell
+strategy={deepspeed_stage_3 or deepspeed_stage_3_offload or fsdp}
 ```
 
 * upload user name and model name at HuggingFace Model card
