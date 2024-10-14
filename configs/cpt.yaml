@@ -56,7 +56,7 @@ peft_config:
 lr: 3e-5
 weight_decay: 1e-1
 warmup_ratio: 5e-2
-eta_min_ratio: 1e-2
+eta_min_ratio: 1e-3
 options:
   return_dict_in_generate: True
   output_scores: True
@@ -71,17 +71,17 @@ accelerator: gpu
 strategy: deepspeed_stage_3_offload
 log_every_n_steps: 10
 precision: bf16
-accumulate_grad_batches: 4
+accumulate_grad_batches: 8
 gradient_clip_val: 1
 gradient_clip_algorithm: norm
-epoch: 5
+epoch: 4
 step: 1e+4
 
 model_name: CausalLM-CPT
 dataset_name: open-Korean
 mode: train
 
-is_tuned: tuned
+is_tuned: untuned
 num_trials: 3
 hparams_save_path: ${connected_dir}/hparams/${model_name}/${dataset_name}/${num_trials}_trials
 tuned_hparams_path: ${hparams_save_path}/best_params.json

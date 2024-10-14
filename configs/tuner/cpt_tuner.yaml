@@ -15,8 +15,8 @@ hparams:
     high: 5e-2
     log: False
   eta_min_ratio:
-    low: 5e-3
-    high: 5e-2
+    low: 5e-4
+    high: 5e-3
     log: False
 
 module_params:

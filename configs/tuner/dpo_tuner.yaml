@@ -7,8 +7,8 @@ hparams:
     high: 1.0
     log: False
   lr:
-    low: 5e-6
-    high: 5e-5
+    low: 5e-8
+    high: 5e-7
     log: False
   weight_decay:
     low: 1e-2
@@ -19,8 +19,8 @@ hparams:
     high: 5e-2
     log: False
   eta_min_ratio:
-    low: 5e-3
-    high: 5e-2
+    low: 5e-4
+    high: 5e-3
     log: False
 
 module_params:
