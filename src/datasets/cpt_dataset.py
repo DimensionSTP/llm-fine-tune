@@ -176,7 +176,7 @@ class StructuralDataset(Dataset):
 {data}
 
 ### Response:
-""".strip()
+"""
         else:
             prompt = f"""### Instruction:
 {instruction} 
@@ -185,5 +185,5 @@ class StructuralDataset(Dataset):
 {data}
 
 ### Response:
-{label} """.strip()
+{label} """
         return prompt
