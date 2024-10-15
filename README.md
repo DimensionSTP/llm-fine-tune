@@ -1,9 +1,9 @@
-# Korean (s)LLM model fine-tuning pipeline
+# LLM model fine-tuning pipeline
 
 ## For (s)LLM model fine-tuning
 
 ### Dataset
-HuggingFace Korean dataset(preprocessed as system_prompt, instruction, and output)
+HuggingFace Korean dataset(preprocessed as instruction, input, and response)
 
 ### Quick setup
 
@@ -13,7 +13,7 @@ git clone https://github.com/DimensionSTP/llm-fine-tune.git
 cd llm-fine-tune
 
 # [OPTIONAL] create conda environment
-conda create -n myenv python=3.8
+conda create -n myenv python=3.10 -y
 conda activate myenv
 
 # install requirements
