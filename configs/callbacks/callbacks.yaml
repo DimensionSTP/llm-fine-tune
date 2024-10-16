@@ -1,7 +1,5 @@
 model_checkpoint:
   _target_: lightning.pytorch.callbacks.ModelCheckpoint
-  monitor: ${monitor}
-  mode: ${tracking_direction}
   every_n_train_steps: ${step}
   save_top_k: -1
   save_last: True
@@ -9,16 +7,3 @@ model_checkpoint:
   dirpath: ${connected_dir}/checkpoints/${model_name}/${dataset_name}/${is_tuned}/${strategy}/${save_detail}
   filename: step={step}
   auto_insert_metric_name: False
-
-early_stopping:
-  _target_: lightning.pytorch.callbacks.EarlyStopping
-  monitor: ${monitor}
-  mode: ${tracking_direction}
-  patience: ${patience}
-  min_delta: ${min_delta}
-
-model_summary:
-  _target_: lightning.pytorch.callbacks.RichModelSummary
-  max_depth: -1
-
-rich_progress_bar:
