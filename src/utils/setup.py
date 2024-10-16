@@ -6,7 +6,7 @@ from hydra.utils import instantiate
 from torch.utils.data import Dataset, DataLoader
 
 from lightning.pytorch import LightningModule
-from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
+from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.loggers.wandb import WandbLogger
 
 
@@ -72,13 +72,10 @@ class SetUp:
         return architecture
 
     def get_callbacks(self) -> List[Any]:
-        model_checkpotint: ModelCheckpoint = instantiate(
+        model_checkpoint: ModelCheckpoint = instantiate(
             self.config.callbacks.model_checkpoint,
         )
-        early_stopping: EarlyStopping = instantiate(
-            self.config.callbacks.early_stopping,
-        )
-        return [model_checkpotint, early_stopping]
+        return model_checkpoint
 
     def get_wandb_logger(self) -> WandbLogger:
         wandb_logger: WandbLogger = instantiate(
