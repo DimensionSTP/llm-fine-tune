@@ -65,8 +65,6 @@ options:
 
 monitor: val_loss
 tracking_direction: min
-patience: ${epoch}
-min_delta: 0
 
 devices: ${oc.decode:${oc.env:DEVICES}}
 accelerator: gpu
