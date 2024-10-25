@@ -1,4 +1,5 @@
-from typing import List, Any
+from typing import Any, List
+import os
 
 from omegaconf import DictConfig
 from hydra.utils import instantiate
@@ -6,7 +7,7 @@ from hydra.utils import instantiate
 from torch.utils.data import Dataset, DataLoader
 
 from lightning.pytorch import LightningModule
-from lightning.pytorch.callbacks import ModelCheckpoint
+from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.loggers.wandb import WandbLogger
 
 
@@ -16,6 +17,14 @@ class SetUp:
         config: DictConfig,
     ) -> None:
         self.config = config
+        self.num_cpus = os.cpu_count()
+        self.num_fit_workers = min(
+            self.num_cpus,
+            (config.devices * config.workers_ratio),
+        )
+        self.num_workers = (
+            self.num_cpus if config.use_all_workers else self.num_fit_workers
+        )
 
     def get_train_loader(self) -> DataLoader:
         train_dataset: Dataset = instantiate(
@@ -26,6 +35,7 @@ class SetUp:
             dataset=train_dataset,
             batch_size=self.config.batch_size,
             shuffle=True,
+            num_workers=self.num_workers,
             pin_memory=True,
         )
 
@@ -38,6 +48,7 @@ class SetUp:
             dataset=val_dataset,
             batch_size=self.config.batch_size,
             shuffle=False,
+            num_workers=self.num_workers,
             pin_memory=True,
         )
 
@@ -50,6 +61,7 @@ class SetUp:
             dataset=test_dataset,
             batch_size=self.config.batch_size,
             shuffle=False,
+            num_workers=self.num_workers,
             pin_memory=True,
         )
 
@@ -62,6 +74,7 @@ class SetUp:
             dataset=predict_dataset,
             batch_size=self.config.batch_size,
             shuffle=False,
+            num_workers=self.num_workers,
             pin_memory=True,
         )
 
@@ -75,7 +88,13 @@ class SetUp:
         model_checkpoint: ModelCheckpoint = instantiate(
             self.config.callbacks.model_checkpoint,
         )
-        return model_checkpoint
+        early_stopping: EarlyStopping = instantiate(
+            self.config.callbacks.early_stopping,
+        )
+        return [
+            model_checkpoint,
+            early_stopping,
+        ]
 
     def get_wandb_logger(self) -> WandbLogger:
         wandb_logger: WandbLogger = instantiate(
