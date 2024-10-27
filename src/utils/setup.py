@@ -1,4 +1,3 @@
-from typing import Any, List
 import os
 
 from omegaconf import DictConfig
@@ -84,17 +83,11 @@ class SetUp:
         )
         return architecture
 
-    def get_callbacks(self) -> List[Any]:
+    def get_callbacks(self) -> ModelCheckpoint:
         model_checkpoint: ModelCheckpoint = instantiate(
             self.config.callbacks.model_checkpoint,
         )
-        early_stopping: EarlyStopping = instantiate(
-            self.config.callbacks.early_stopping,
-        )
-        return [
-            model_checkpoint,
-            early_stopping,
-        ]
+        return model_checkpoint
 
     def get_wandb_logger(self) -> WandbLogger:
         wandb_logger: WandbLogger = instantiate(
