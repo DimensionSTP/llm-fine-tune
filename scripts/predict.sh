@@ -14,6 +14,8 @@ precision="bf16"
 batch_size=16
 accumulate_grad_batches=8
 lr=3e-5
+workers_ratio=8
+use_all_workers=False
 steps="50000 60000"
 
 for step in $steps
