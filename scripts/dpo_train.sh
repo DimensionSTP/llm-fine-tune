@@ -14,6 +14,7 @@ target_max_length=1024
 precision="bf16"
 batch_size=4
 accumulate_grad_batches=4
+dpo_beta=0.5
 lr=3e-7
 weight_decay=1e-1
 warmup_ratio=5e-2
