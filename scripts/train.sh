@@ -43,4 +43,6 @@ python main.py mode=train \
     warmup_ratio=$warmup_ratio \
     eta_min_ratio=$eta_min_ratio \
     epoch=$epoch \
-    step=$step
+    step=$step \
+    workers_ratio=$workers_ratio \
+    use_all_workers=$use_all_workers

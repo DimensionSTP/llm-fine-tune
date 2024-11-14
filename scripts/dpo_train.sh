@@ -39,9 +39,12 @@ python main.py --config-name=dpo.yaml mode=train \
     precision=$precision \
     batch_size=$batch_size \
     accumulate_grad_batches=$accumulate_grad_batches \
+    dpo_beta=$dpo_beta \
     lr=$lr \
     weight_decay=$weight_decay \
     warmup_ratio=$warmup_ratio \
     eta_min_ratio=$eta_min_ratio \
     epoch=$epoch \
-    step=$step
+    step=$step \
+    workers_ratio=$workers_ratio \
+    use_all_workers=$use_all_workers

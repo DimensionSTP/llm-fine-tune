@@ -35,6 +35,8 @@ do
         batch_size=$batch_size \
         accumulate_grad_batches=$accumulate_grad_batches \
         lr=$lr \
+        workers_ratio=$workers_ratio \
+        use_all_workers=$use_all_workers \
         step=$step
 done
 
@@ -55,5 +57,7 @@ do
         batch_size=$batch_size \
         accumulate_grad_batches=$accumulate_grad_batches \
         lr=$lr \
+        workers_ratio=$workers_ratio \
+        use_all_workers=$use_all_workers \
         step=$step
 done
