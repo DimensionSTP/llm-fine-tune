@@ -17,9 +17,11 @@ accumulate_grad_batches=4
 lr=3e-7
 weight_decay=1e-1
 warmup_ratio=5e-2
-eta_min_ratio=1e-3
-epoch=4
+eta_min_ratio=1e-2
+epoch=5
 step=1e+2
+workers_ratio=8
+use_all_workers=False
 
 python main.py --config-name=dpo.yaml mode=train \
     split_ratio=$split_ratio \
