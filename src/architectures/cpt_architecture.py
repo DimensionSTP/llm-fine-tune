@@ -18,6 +18,7 @@ class CausalLMArchitecture(LightningModule):
         self,
         model: nn.Module,
         pretrained_model_name: str,
+        is_sft: bool,
         is_preprocessed: bool,
         custom_data_encoder_path: str,
         left_padding: bool,
@@ -36,6 +37,7 @@ class CausalLMArchitecture(LightningModule):
         super().__init__()
         self.model = model
         self.pretrained_model_name = pretrained_model_name
+        self.is_sft = is_sft
         if is_preprocessed:
             data_encoder_path = custom_data_encoder_path
         else:
@@ -82,7 +84,8 @@ class CausalLMArchitecture(LightningModule):
         mode: str,
     ) -> Dict[str, torch.Tensor]:
         encoded = batch["encoded"]
-        encoded["labels"] = encoded["input_ids"]
+        if not self.is_sft:
+            encoded["labels"] = encoded["input_ids"]
         label = encoded["labels"]
         index = batch["index"]
         output = self(
