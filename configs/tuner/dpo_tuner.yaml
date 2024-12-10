@@ -24,6 +24,7 @@ hparams:
     log: False
 
 module_params:
+  is_sft: ${is_sft}
   is_preprocessed: ${is_preprocessed}
   custom_data_encoder_path: ${custom_data_encoder_path}
   left_padding: ${left_padding}
