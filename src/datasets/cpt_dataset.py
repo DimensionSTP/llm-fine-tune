@@ -16,6 +16,7 @@ class StructuralDataset(Dataset):
         split: str,
         split_ratio: float,
         seed: int,
+        is_sft: bool,
         is_preprocessed: bool,
         instruction_column_name: str,
         data_column_name: str,
@@ -32,6 +33,7 @@ class StructuralDataset(Dataset):
         self.split = split
         self.split_ratio = split_ratio
         self.seed = seed
+        self.is_sft = is_sft
         self.is_preprocessed = is_preprocessed
         self.instruction_column_name = instruction_column_name
         self.data_column_name = data_column_name
@@ -76,6 +78,12 @@ class StructuralDataset(Dataset):
             data=prompt,
             data_type="data",
         )
+        if self.is_sft:
+            label = self.encode_text(
+                data=self.labels[idx],
+                data_type="target",
+            )
+            encoded["labels"] = label
         if "token_type_ids" in encoded.keys():
             del encoded["token_type_ids"]
         return {
