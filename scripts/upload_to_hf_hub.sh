@@ -1,6 +1,7 @@
 #!/bin/bash
 
 path="src/postprocessing"
+is_sft=False
 is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
@@ -19,6 +20,7 @@ step=50000
 model_detail="Llama-3.1-8B-Instruct"
 
 python $path/upload_to_hf_hub.py \
+    is_sft=$is_sft \
     is_preprocessed=$is_preprocessed \
     is_tuned=$is_tuned \
     strategy=$strategy \

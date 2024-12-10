@@ -1,5 +1,6 @@
 #!/bin/bash
 
+is_sft=False
 is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_2_offload"
@@ -22,6 +23,7 @@ steps="50000 60000"
 for step in $steps
 do
     python main.py --config-name=dpo.yaml mode=predict \
+        is_sft=$is_sft \
         is_preprocessed=$is_preprocessed \
         is_tuned=$is_tuned \
         strategy=$strategy \

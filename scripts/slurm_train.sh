@@ -11,6 +11,7 @@ module add compilers/cuda/12.4 compilers/gcc/10.2.0
 source activate myenv
 
 split_ratio=1e-4
+is_sft=False
 is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
@@ -35,6 +36,7 @@ use_all_workers=False
 
 python main.py mode=train \
     split_ratio=$split_ratio \
+    is_sft=$is_sft \
     is_preprocessed=$is_preprocessed \
     is_tuned=$is_tuned \
     strategy=$strategy \
