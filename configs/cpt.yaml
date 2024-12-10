@@ -25,6 +25,7 @@ workers_ratio: 8
 use_all_workers: False
 
 split_ratio: 1e-4
+is_sft: False
 is_preprocessed: False
 instruction_column_name: instruction
 data_column_name: input
