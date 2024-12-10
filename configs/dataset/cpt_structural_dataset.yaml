@@ -3,6 +3,7 @@ data_path: ${connected_dir}/data
 split: ${split.train}
 split_ratio: ${split_ratio}
 seed: ${seed}
+is_sft: ${is_sft}
 is_preprocessed: ${is_preprocessed}
 instruction_column_name: ${instruction_column_name}
 data_column_name: ${data_column_name}
