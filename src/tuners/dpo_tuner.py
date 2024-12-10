@@ -137,6 +137,7 @@ class CausalLMTuner:
         architecture = CausalLMArchitecture(
             model=model,
             pretrained_model_name=params["pretrained_model_name"],
+            is_sft=self.module_params.is_sft,
             is_preprocessed=self.module_params.is_preprocessed,
             custom_data_encoder_path=self.module_params.custom_data_encoder_path,
             left_padding=self.module_params.left_padding,
