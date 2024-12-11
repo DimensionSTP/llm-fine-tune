@@ -64,6 +64,12 @@ class StructuralDataset(Dataset):
         self.rejections = dataset["rejections"]
         self.data_max_length = data_max_length
         self.target_max_length = target_max_length
+        self.response_template = "### Response:\n"
+        self.response_template_tokens = self.data_encoder(
+            self.response_template,
+            add_special_tokens=False,
+        )["input_ids"]
+        self.ignore_index = -100
 
     def __len__(self) -> int:
         return len(self.datas)
@@ -77,16 +83,7 @@ class StructuralDataset(Dataset):
             data=self.datas[idx],
             label=self.choices[idx],
         )
-        encoded_choice = self.encode_text(
-            data=prompt_choice,
-            data_type="data",
-        )
-        if self.is_sft:
-            label_choice = self.encode_text(
-                data=self.choices[idx],
-                data_type="target",
-            )
-            encoded_choice["labels"] = label_choice
+        encoded_choice = self.encode_text(data=prompt_choice)
         if "token_type_ids" in encoded_choice.keys():
             del encoded_choice["token_type_ids"]
 
@@ -95,16 +92,7 @@ class StructuralDataset(Dataset):
             data=self.datas[idx],
             label=self.rejections[idx],
         )
-        encoded_rejection = self.encode_text(
-            data=prompt_rejection,
-            data_type="data",
-        )
-        if self.is_sft:
-            label_rejection = self.encode_text(
-                data=self.rejections[idx],
-                data_type="target",
-            )
-            encoded_rejection["labels"] = label_rejection
+        encoded_rejection = self.encode_text(data=prompt_rejection)
         if "token_type_ids" in encoded_rejection.keys():
             del encoded_rejection["token_type_ids"]
         return {
@@ -172,17 +160,13 @@ class StructuralDataset(Dataset):
     def encode_text(
         self,
         data: str,
-        data_type: str,
     ) -> Dict[str, torch.Tensor]:
-        if data_type == "data":
-            if self.split == "predict":
-                max_length = self.data_max_length
-            else:
-                max_length = self.data_max_length + self.target_max_length
-        elif data_type == "target":
-            max_length = self.target_max_length
+        if self.split == "predict":
+            max_length = self.data_max_length
         else:
-            raise ValueError(f"Inavalid data_type: {data_type}")
+            max_length = self.data_max_length + self.target_max_length
+        max_length = self.target_max_length
+
         encoded = self.data_encoder(
             data,
             padding="max_length",
@@ -191,7 +175,27 @@ class StructuralDataset(Dataset):
             return_tensors="pt",
             add_special_tokens=True,
         )
+
         encoded = {k: v.squeeze(0) for k, v in encoded.items()}
+
+        if self.is_sft:
+            try:
+                response_start_idx = next(
+                    i
+                    for i in range(
+                        len(encoded["input_ids"])
+                        - len(self.response_template_tokens)
+                        + 1
+                    )
+                    if encoded["input_ids"][i : i + len(self.response_template_tokens)]
+                    == self.response_template_tokens
+                )
+                encoded["labels"] = encoded["input_ids"].clone()
+                encoded["labels"][
+                    : response_start_idx + len(self.response_template_tokens)
+                ] = self.ignore_index
+            except StopIteration:
+                encoded["labels"] = encoded["input_ids"].clone()
         return encoded
 
     def generate_prompt(
@@ -207,8 +211,7 @@ class StructuralDataset(Dataset):
 ### Input:
 {data}
 
-### Response:
-"""
+{self.response_template}"""
         else:
             prompt = f"""### Instruction:
 {instruction} 
@@ -216,6 +219,5 @@ class StructuralDataset(Dataset):
 ### Input:
 {data}
 
-### Response:
-{label} """
+{self.response_template}{label} """
         return prompt
