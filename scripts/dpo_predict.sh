@@ -14,8 +14,6 @@ target_max_length=1024
 precision="bf16"
 batch_size=16
 accumulate_grad_batches=8
-dpo_beta=0.5
-lr=3e-7
 workers_ratio=8
 use_all_workers=False
 steps="50000 60000"
@@ -37,8 +35,6 @@ do
         precision=$precision \
         batch_size=$batch_size \
         accumulate_grad_batches=$accumulate_grad_batches \
-        dpo_beta=$dpo_beta \
-        lr=$lr \
         workers_ratio=$workers_ratio \
         use_all_workers=$use_all_workers \
         step=$step
@@ -60,8 +56,6 @@ do
         precision=$precision \
         batch_size=$batch_size \
         accumulate_grad_batches=$accumulate_grad_batches \
-        dpo_beta=$dpo_beta \
-        lr=$lr \
         workers_ratio=$workers_ratio \
         use_all_workers=$use_all_workers \
         step=$step
