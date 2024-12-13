@@ -28,6 +28,16 @@ def upload_to_hf_hub(
     save_dir = f"{config.connected_dir}/prepare_upload/{config.model_detail}/step={config.step}"
     api = HfApi()
     token = HfFolder.get_token()
+
+    repo_id = f"{config.user_name}/{config.model_detail}-{config.upload_tag}"
+    api.create_repo(
+        repo_id=repo_id,
+        token=token,
+        private=True,
+        repo_type="model",
+        exist_ok=True,
+    )
+
     api.upload_folder(
         folder_path=save_dir,
         repo_id=f"{config.user_name}/{config.model_detail}-{config.upload_tag}",
