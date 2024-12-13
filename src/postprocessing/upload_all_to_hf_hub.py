@@ -12,7 +12,7 @@ os.environ["HF_HOME"] = os.environ.get("HF_HOME")
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 warnings.filterwarnings("ignore")
 
-from huggingface_hub import HfApi, HfFolder, CommitOperationAdd
+from huggingface_hub import HfApi, HfFolder
 
 from tqdm import tqdm
 
