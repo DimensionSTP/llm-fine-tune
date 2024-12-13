@@ -6,7 +6,7 @@ is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
 upload_user="meta-llama"
-model_type="Meta-Llama-3.1-8B-Instruct"
+model_type="Llama-3.1-8B-Instruct"
 left_padding=False
 quantization_type="origin"
 peft_type="origin"
@@ -15,9 +15,10 @@ target_max_length=1024
 precision="bf16"
 batch_size=16
 accumulate_grad_batches=8
-lr=3e-5
 step=50000
+upload_tag="open-Korean"
 model_detail="Llama-3.1-8B-Instruct"
+num_safetensors=10
 
 python $path/prepare_upload.py \
     is_sft=$is_sft \
@@ -34,6 +35,7 @@ python $path/prepare_upload.py \
     precision=$precision \
     batch_size=$batch_size \
     accumulate_grad_batches=$accumulate_grad_batches \
-    lr=$lr \
     step=$step \
-    model_detail=$model_detail
+    upload_tag=$upload_tag \
+    model_detail=$model_detail \
+    num_safetensors=$num_safetensors
