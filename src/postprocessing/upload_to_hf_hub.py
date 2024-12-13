@@ -39,10 +39,11 @@ def upload_to_hf_hub(
     )
 
     api.upload_folder(
-        folder_path=save_dir,
         repo_id=f"{config.user_name}/{config.model_detail}-{config.upload_tag}",
-        repo_type="model",
+        folder_path=save_dir,
+        commit_message=f"Upload step={config.step}",
         token=token,
+        repo_type="model",
     )
 
 
