@@ -35,11 +35,10 @@ def prepare_upload(
     config: DictConfig,
 ) -> None:
     save_dir = f"{config.connected_dir}/prepare_upload/{config.model_detail}/step={config.step}"
-    if not os.path.exists(save_dir):
-        os.makedirs(
-            save_dir,
-            exist_ok=True,
-        )
+    os.makedirs(
+        save_dir,
+        exist_ok=True,
+    )
 
     if config.strategy.startswith("deepspeed"):
         checkpoint = torch.load(f"{config.ckpt_path}/model.pt")
