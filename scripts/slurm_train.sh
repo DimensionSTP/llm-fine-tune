@@ -2,12 +2,13 @@
 #SBATCH --job-name=train_job
 #SBATCH --partition=8gpu
 #SBATCH --gres=gpu:8
+#SBATCH --nodelist=gpu-8-003
 #SBATCH --output=logs/train_output.log
 #SBATCH --error=logs/train_error.log
 
 cd ~/llm-fine-tune
 
-module add compilers/cuda/12.4 compilers/gcc/10.2.0
+module add compilers/cuda/12.4 compilers/gcc/10.2.0 libraries/nccl/2.21.5
 source activate myenv
 
 split_ratio=1e-4
