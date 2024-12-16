@@ -12,10 +12,12 @@ os.environ["HF_HOME"] = os.environ.get("HF_HOME")
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 warnings.filterwarnings("ignore")
 
+import json
+
 from huggingface_hub import HfApi, HfFolder
 
 import hydra
-from omegaconf import DictConfig
+from omegaconf import OmegaConf, DictConfig
 
 
 @hydra.main(

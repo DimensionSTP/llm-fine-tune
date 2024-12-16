@@ -24,7 +24,7 @@ from safetensors.torch import save_file
 from tqdm import tqdm
 
 import hydra
-from omegaconf import DictConfig
+from omegaconf import OmegaConf, DictConfig
 
 
 @hydra.main(
