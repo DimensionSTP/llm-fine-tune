@@ -29,7 +29,24 @@ from omegaconf import OmegaConf, DictConfig
 def upload_to_hf_hub(
     config: DictConfig,
 ) -> None:
-    base_dir = f"{config.connected_dir}/prepare_upload/{config.model_detail}"
+    if config.is_tuned == "tuned":
+        params = json.load(
+            open(
+                config.tuned_hparams_path,
+                "rt",
+                encoding="UTF-8",
+            )
+        )
+        config = OmegaConf.merge(
+            config,
+            params,
+        )
+    elif config.is_tuned == "untuned":
+        pass
+    else:
+        raise ValueError(f"Invalid is_tuned argument: {config.is_tuned}")
+
+    base_dir = f"{config.connected_dir}/prepare_upload/{config.upload_tag}/{config.model_detail}"
     api = HfApi()
     token = HfFolder.get_token()
 
