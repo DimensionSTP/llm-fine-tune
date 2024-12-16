@@ -15,6 +15,7 @@ target_max_length=1024
 precision="bf16"
 batch_size=16
 accumulate_grad_batches=8
+dataset_name="open-Korean"
 upload_tag="open-Korean"
 model_detail="Llama-3.1-8B-Instruct"
 
@@ -33,5 +34,6 @@ python $path/upload_all_to_hf_hub.py \
     precision=$precision \
     batch_size=$batch_size \
     accumulate_grad_batches=$accumulate_grad_batches \
+    dataset_name=$dataset_name \
     upload_tag=$upload_tag \
     model_detail=$model_detail
