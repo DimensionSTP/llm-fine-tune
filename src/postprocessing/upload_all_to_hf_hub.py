@@ -46,7 +46,7 @@ def upload_to_hf_hub(
     else:
         raise ValueError(f"Invalid is_tuned argument: {config.is_tuned}")
 
-    base_dir = f"{config.connected_dir}/prepare_upload/{config.upload_tag}/{config.model_detail}"
+    base_dir = f"{config.connected_dir}/prepare_upload/{config.model_detail}/{config.upload_tag}"
     api = HfApi()
     token = HfFolder.get_token()
 

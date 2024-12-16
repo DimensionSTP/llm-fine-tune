@@ -51,7 +51,7 @@ def prepare_upload(
     else:
         raise ValueError(f"Invalid is_tuned argument: {config.is_tuned}")
 
-    base_dir = f"{config.connected_dir}/prepare_upload/{config.upload_tag}/{config.model_detail}"
+    base_dir = f"{config.connected_dir}/prepare_upload/{config.model_detail}/{config.upload_tag}"
     checkpoints = [
         ckpt
         for ckpt in os.listdir(config.callbacks.model_checkpoint.dirpath)
