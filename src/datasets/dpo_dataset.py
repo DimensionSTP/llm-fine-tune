@@ -161,11 +161,9 @@ class StructuralDataset(Dataset):
         self,
         data: str,
     ) -> Dict[str, torch.Tensor]:
+        max_length = self.data_max_length + self.target_max_length
         if self.split == "predict":
             max_length = self.data_max_length
-        else:
-            max_length = self.data_max_length + self.target_max_length
-        max_length = self.target_max_length
 
         encoded = self.data_encoder(
             data,
