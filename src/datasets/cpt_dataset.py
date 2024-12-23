@@ -55,6 +55,13 @@ class StructuralDataset(Dataset):
             self.data_encoder.padding_side = "left"
         else:
             self.data_encoder.padding_side = "right"
+
+        if self.data_encoder.chat_template is None:
+            reference_data_encoder = AutoTokenizer.from_pretrained(
+                "meta-llama/Llama-3.2-1B-Instruct"
+            )
+            self.data_encoder.chat_template = reference_data_encoder.chat_template
+
         dataset = self.get_dataset()
         self.instructions = dataset["instructions"]
         self.datas = dataset["datas"]
