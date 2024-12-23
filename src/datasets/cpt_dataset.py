@@ -214,27 +214,3 @@ class StructuralDataset(Dataset):
             except StopIteration:
                 encoded["labels"] = encoded["input_ids"].clone()
         return encoded
-
-    def generate_prompt(
-        self,
-        instruction: str,
-        data: str,
-        label: str,
-    ) -> str:
-        if self.split == "predict":
-            prompt = f"""### Instruction:
-{instruction} 
-
-### Input:
-{data}
-
-{self.response_template}"""
-        else:
-            prompt = f"""### Instruction:
-{instruction} 
-
-### Input:
-{data}
-
-{self.response_template}{label} """
-        return prompt
