@@ -75,7 +75,7 @@ class StructuralDataset(Dataset):
         self,
         idx: int,
     ) -> Dict[str, Any]:
-        prompt = self.generate_prompt(
+        prompt = self.apply_chat_template(
             instruction=self.instructions[idx],
             data=self.datas[idx],
             label=self.labels[idx],
