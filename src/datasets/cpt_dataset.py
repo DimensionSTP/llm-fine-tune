@@ -142,6 +142,40 @@ class StructuralDataset(Dataset):
             "labels": labels,
         }
 
+    def apply_chat_template(
+        self,
+        instruction: str,
+        data: str,
+        label: str,
+    ) -> str:
+        if self.is_sft:
+            label = f"{self.response_template}{label}"
+
+        conversation = [
+            {
+                "role": "system",
+                "content": instruction,
+            },
+            {
+                "role": "user",
+                "content": data,
+            },
+        ]
+        if self.split != "predict":
+            conversation.append(
+                {
+                    "role": "assistant",
+                    "content": label,
+                }
+            )
+
+        prompt = self.data_encoder.apply_chat_template(
+            conversation=conversation,
+            tokenize=False,
+            add_generation_prompt=False if self.split != "predict" else True,
+        )
+        return prompt
+
     def encode_text(
         self,
         data: str,
