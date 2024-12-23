@@ -196,6 +196,7 @@ class StructuralDataset(Dataset):
         encoded = {k: v.squeeze(0) for k, v in encoded.items()}
 
         if self.is_sft:
+            encoded["labels"] = encoded["input_ids"].clone()
             try:
                 response_start_idx = next(
                     i
@@ -212,5 +213,5 @@ class StructuralDataset(Dataset):
                     : response_start_idx + len(self.response_template_tokens)
                 ] = self.ignore_index
             except StopIteration:
-                encoded["labels"] = encoded["input_ids"].clone()
+                pass
         return encoded
