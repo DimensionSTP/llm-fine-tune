@@ -19,7 +19,7 @@ from omegaconf import DictConfig
 
 @hydra.main(
     config_path="configs/",
-    config_name="huggingface.yaml",
+    config_name="cpt.yaml",
 )
 def merge_predictions(
     config: DictConfig,
