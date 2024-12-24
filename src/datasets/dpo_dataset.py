@@ -87,7 +87,7 @@ class StructuralDataset(Dataset):
         self,
         idx: int,
     ) -> Dict[str, Any]:
-        prompt_choice = self.generate_prompt(
+        prompt_choice = self.apply_chat_template(
             instruction=self.instructions[idx],
             data=self.datas[idx],
             label=self.choices[idx],
@@ -96,7 +96,7 @@ class StructuralDataset(Dataset):
         if "token_type_ids" in encoded_choice.keys():
             del encoded_choice["token_type_ids"]
 
-        prompt_rejection = self.generate_prompt(
+        prompt_rejection = self.apply_chat_template(
             instruction=self.instructions[idx],
             data=self.datas[idx],
             label=self.rejections[idx],
@@ -165,6 +165,40 @@ class StructuralDataset(Dataset):
             "choices": choices,
             "rejections": rejections,
         }
+
+    def apply_chat_template(
+        self,
+        instruction: str,
+        data: str,
+        label: str,
+    ) -> str:
+        if self.is_sft:
+            label = f"{self.response_template}{label}"
+
+        conversation = [
+            {
+                "role": "system",
+                "content": instruction,
+            },
+            {
+                "role": "user",
+                "content": data,
+            },
+        ]
+        if self.split != "predict":
+            conversation.append(
+                {
+                    "role": "assistant",
+                    "content": label,
+                }
+            )
+
+        prompt = self.data_encoder.apply_chat_template(
+            conversation=conversation,
+            tokenize=False,
+            add_generation_prompt=False if self.split != "predict" else True,
+        )
+        return prompt
 
     def encode_text(
         self,
