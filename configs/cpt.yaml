@@ -102,8 +102,8 @@ pred_name: ${save_detail}-step=${step}
 submission_name: ${save_detail}-step=${step}
 
 user_name: ${oc.env:USER_NAME}
-upload_tag: open-Korean
 model_detail: Llama-3.1-8B-Instruct
+upload_tag: open-Korean
 num_safetensors: 10
 
 korean_model_name: beomi/OPEN-SOLAR-KO-10.7B
