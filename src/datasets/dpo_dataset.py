@@ -26,6 +26,7 @@ class StructuralDataset(Dataset):
         batch_size: int,
         pretrained_model_name: str,
         custom_data_encoder_path: str,
+        reference_data_encoder_name: str,
         left_padding: bool,
         data_max_length: int,
         target_max_length: int,
@@ -51,12 +52,20 @@ class StructuralDataset(Dataset):
             data_encoder_path,
             use_fast=True,
         )
+
+        if self.data_encoder.chat_template is None:
+            reference_data_encoder = AutoTokenizer.from_pretrained(
+                reference_data_encoder_name
+            )
+            self.data_encoder.chat_template = reference_data_encoder.chat_template
+
         if self.data_encoder.pad_token_id is None:
             self.data_encoder.pad_token_id = self.data_encoder.eos_token_id
         if left_padding:
             self.data_encoder.padding_side = "left"
         else:
             self.data_encoder.padding_side = "right"
+
         dataset = self.get_dataset()
         self.instructions = dataset["instructions"]
         self.datas = dataset["datas"]
