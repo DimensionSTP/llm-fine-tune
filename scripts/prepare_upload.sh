@@ -17,8 +17,8 @@ batch_size=16
 accumulate_grad_batches=8
 step=180000
 dataset_name="open-Korean"
-upload_tag="open-Korean"
 model_detail="Llama-3.1-8B-Instruct"
+upload_tag="open-Korean"
 num_safetensors=10
 
 python $path/prepare_upload.py \
@@ -38,6 +38,6 @@ python $path/prepare_upload.py \
     accumulate_grad_batches=$accumulate_grad_batches \
     step=$step \
     dataset_name=$dataset_name \
-    upload_tag=$upload_tag \
     model_detail=$model_detail \
+    upload_tag=$upload_tag \
     num_safetensors=$num_safetensors
