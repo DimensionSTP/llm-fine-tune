@@ -9,14 +9,14 @@ model_type="Llama-3.1-8B-Instruct"
 left_padding=False
 quantization_type="origin"
 peft_type="origin"
-data_max_length=1024
-target_max_length=1024
+data_max_length=2048
+target_max_length=2048
 precision="bf16"
 batch_size=16
 accumulate_grad_batches=8
 workers_ratio=8
 use_all_workers=False
-steps="50000 60000"
+steps="170000 180000"
 
 for step in $steps
 do
