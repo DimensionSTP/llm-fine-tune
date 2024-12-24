@@ -37,8 +37,8 @@ custom_data_encoder_path: ${connected_dir}/data/merged_tokenizer/${pretrained_mo
 reference_data_encoder_name: HuggingFaceTB/SmolLM2-135M-Instruct
 left_padding: False
 merged_model_path: ${connected_dir}/data/merged_model/${pretrained_model_name}
-data_max_length: 1024
-target_max_length: 1024
+data_max_length: 2048
+target_max_length: 2048
 target_min_length: 16
 
 quantization_type: origin
