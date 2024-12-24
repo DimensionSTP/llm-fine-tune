@@ -35,6 +35,7 @@ upload_user: meta-llama
 model_type: Llama-3.1-8B-Instruct
 pretrained_model_name: ${upload_user}/${model_type}
 custom_data_encoder_path: ${connected_dir}/data/merged_tokenizer/${pretrained_model_name}
+reference_data_encoder_name: HuggingFaceTB/SmolLM2-135M-Instruct
 left_padding: False
 merged_model_path: ${connected_dir}/data/merged_model/${pretrained_model_name}
 data_max_length: 1024
