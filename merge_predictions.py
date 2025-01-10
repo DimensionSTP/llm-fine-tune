@@ -48,11 +48,10 @@ def merge_predictions(
     if len(all_generations) > len(generation_df):
         all_generations = all_generations[: len(generation_df)]
     generation_df[config.target_column_name] = all_generations
-    if not os.path.exists(f"{config.connected_dir}/submissions"):
-        os.makedirs(
-            f"{config.connected_dir}/submissions",
-            exist_ok=True,
-        )
+    os.makedirs(
+        f"{config.connected_dir}/submissions",
+        exist_ok=True,
+    )
     generation_df.to_csv(
         f"{config.connected_dir}/submissions/{config.submission_name}.csv",
         index=False,
