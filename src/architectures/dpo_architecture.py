@@ -79,11 +79,13 @@ class CausalLMArchitecture(LightningModule):
     ) -> Dict[str, torch.Tensor]:
         if mode == "train":
             model.train()
+            output = model(encoded)
         elif mode == "eval":
             model.eval()
+            with torch.no_grad():
+                output = model(encoded)
         else:
             raise ValueError(f"Invalid model mode: {mode}")
-        output = model(encoded)
         return output
 
     def step(
