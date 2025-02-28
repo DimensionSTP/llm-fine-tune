@@ -3,7 +3,7 @@
 is_sft=False
 is_preprocessed=False
 is_tuned="untuned"
-strategy="deepspeed_stage_2_offload"
+strategy="deepspeed_stage_3_offload"
 upload_user="meta-llama"
 model_type="Llama-3.1-8B-Instruct"
 left_padding=False
