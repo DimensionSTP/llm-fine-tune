@@ -82,13 +82,13 @@ class StructuralDataset(Dataset):
             self.response_start_template,
             return_tensors="pt",
             add_special_tokens=False,
-        )["input_ids"]
+        )["input_ids"].squeeze(0)
         self.response_end_template = "\n</response>"
         self.response_end_tokens = self.data_encoder(
             self.response_end_template,
             return_tensors="pt",
             add_special_tokens=False,
-        )["input_ids"]
+        )["input_ids"].squeeze(0)
         self.ignore_index = -100
 
     def __len__(self) -> int:
