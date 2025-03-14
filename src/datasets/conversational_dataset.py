@@ -215,20 +215,20 @@ class StructuralDataset(Dataset):
 
     def find_pattern_indices(
         self,
-        labels: torch.Tensor,
+        input_ids: torch.Tensor,
         pattern: torch.Tensor,
     ) -> List[int]:
         pattern_length = pattern.size(0)
 
-        if pattern_length > labels.size(0):
+        if pattern_length > input_ids.size(0):
             return torch.tensor(
                 [],
                 dtype=torch.long,
             )
 
         indices = []
-        for i in range(labels.size(0) - pattern_length + 1):
-            if torch.equal(labels[i : i + pattern_length], pattern):
+        for i in range(input_ids.size(0) - pattern_length + 1):
+            if torch.equal(input_ids[i : i + pattern_length], pattern):
                 indices.append(i)
         return indices
 
@@ -243,11 +243,11 @@ class StructuralDataset(Dataset):
         )
 
         start_indices = self.find_pattern_indices(
-            labels=labels,
+            input_ids=input_ids,
             pattern=self.response_start_tokens,
         )
         end_indices = self.find_pattern_indices(
-            labels=labels,
+            input_ids=input_ids,
             pattern=self.response_end_tokens,
         )
 
