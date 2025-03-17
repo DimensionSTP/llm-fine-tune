@@ -217,10 +217,7 @@ class StructuralDataset(Dataset):
         pattern_length = pattern.size(0)
 
         if pattern_length > input_ids.size(0):
-            return torch.tensor(
-                [],
-                dtype=torch.long,
-            )
+            return []
 
         indices = []
         for i in range(input_ids.size(0) - pattern_length + 1):
