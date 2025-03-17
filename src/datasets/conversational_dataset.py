@@ -77,13 +77,13 @@ class StructuralDataset(Dataset):
         self.data_max_length = data_max_length
         self.target_max_length = target_max_length
 
-        self.response_start_template = "<response>\n"
+        self.response_start_template = "### Start"
         self.response_start_tokens = self.data_encoder(
             self.response_start_template,
             return_tensors="pt",
             add_special_tokens=False,
         )["input_ids"].squeeze(0)
-        self.response_end_template = "\n</response>"
+        self.response_end_template = "### End"
         self.response_end_tokens = self.data_encoder(
             self.response_end_template,
             return_tensors="pt",
@@ -166,11 +166,7 @@ class StructuralDataset(Dataset):
                 turn[self.role_column_name] in self.assistant_column_names
                 and self.is_sft
             ):
-                content = (
-                    self.response_start_template
-                    + turn[self.content_column_name]
-                    + self.response_end_template
-                )
+                content = f"\n{self.response_start_template}\n{turn[self.content_column_name]}\n{self.response_end_template}\n"
                 preprocessed_turn = {
                     self.role_column_name: turn[self.role_column_name],
                     self.content_column_name: content,
