@@ -15,8 +15,8 @@ from optuna.pruners import HyperbandPruner
 from transformers import BitsAndBytesConfig
 from peft import LoraConfig
 
-from ..architectures.models.huggingface_model import HuggingFaceModel
-from ..architectures.cpt_architecture import CausalLMArchitecture
+from ..architectures import HuggingFaceModel
+from ..architectures import CPTCausalLMArchitecture
 
 
 class CausalLMTuner:
@@ -126,7 +126,7 @@ class CausalLMTuner:
             peft_type=self.module_params.peft_type,
             peft_config=LoraConfig(**self.module_params.peft_config),
         )
-        architecture = CausalLMArchitecture(
+        architecture = CPTCausalLMArchitecture(
             model=model,
             pretrained_model_name=params["pretrained_model_name"],
             is_sft=self.module_params.is_sft,
