@@ -15,8 +15,8 @@ from optuna.pruners import HyperbandPruner
 from transformers import BitsAndBytesConfig
 from peft import LoraConfig
 
-from ..architectures.models.huggingface_model import HuggingFaceModel
-from ..architectures.cpt_architecture import CausalLMArchitecture
+from ..architectures import HuggingFaceModel
+from ..architectures import CPTCausalLMArchitecture
 
 
 class CausalLMTuner:
@@ -24,22 +24,24 @@ class CausalLMTuner:
         self,
         hparams: Dict[str, Any],
         module_params: Dict[str, Any],
-        direction: str,
+        tracking_direction: str,
         seed: int,
         num_trials: int,
         hparams_save_path: str,
         train_loader: DataLoader,
         val_loader: DataLoader,
+        callbacks: EarlyStopping,
         logger: WandbLogger,
     ) -> None:
         self.hparams = hparams
         self.module_params = module_params
-        self.direction = direction
+        self.direction = f"{tracking_direction}imize"
         self.seed = seed
         self.num_trials = num_trials
         self.hparams_save_path = hparams_save_path
         self.train_loader = train_loader
         self.val_loader = val_loader
+        self.callbacks = callbacks
         self.logger = logger
 
     def __call__(self) -> None:
@@ -77,11 +79,6 @@ class CausalLMTuner:
 
         params = dict()
         params["seed"] = self.seed
-        if self.hparams.pretrained_model_name:
-            params["pretrained_model_name"] = trial.suggest_categorical(
-                name="pretrained_model_name",
-                choices=self.hparams.pretrained_model_name,
-            )
         if self.hparams.lr:
             params["lr"] = trial.suggest_float(
                 name="lr",
@@ -112,7 +109,7 @@ class CausalLMTuner:
             )
 
         model = HuggingFaceModel(
-            pretrained_model_name=params["pretrained_model_name"],
+            pretrained_model_name=self.module_params.pretrained_model_name,
             is_preprocessed=self.module_params.is_preprocessed,
             custom_data_encoder_path=self.module_params.custom_data_encoder_path,
             left_padding=self.module_params.left_padding,
@@ -126,9 +123,9 @@ class CausalLMTuner:
             peft_type=self.module_params.peft_type,
             peft_config=LoraConfig(**self.module_params.peft_config),
         )
-        architecture = CausalLMArchitecture(
+        architecture = CPTCausalLMArchitecture(
             model=model,
-            pretrained_model_name=params["pretrained_model_name"],
+            pretrained_model_name=self.module_params.pretrained_model_name,
             is_sft=self.module_params.is_sft,
             is_preprocessed=self.module_params.is_preprocessed,
             custom_data_encoder_path=self.module_params.custom_data_encoder_path,
@@ -147,12 +144,6 @@ class CausalLMTuner:
         )
 
         self.logger.log_hyperparams(params)
-        callbacks = EarlyStopping(
-            monitor=self.module_params.monitor,
-            mode=self.module_params.mode,
-            patience=self.module_params.patience,
-            min_delta=self.module_params.min_delta,
-        )
 
         trainer = Trainer(
             devices=self.module_params.devices,
@@ -165,7 +156,7 @@ class CausalLMTuner:
             gradient_clip_algorithm=self.module_params.gradient_clip_algorithm,
             max_epochs=self.module_params.max_epochs,
             enable_checkpointing=False,
-            callbacks=callbacks,
+            callbacks=self.callbacks,
             logger=self.logger,
         )
 

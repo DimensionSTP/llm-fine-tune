@@ -1,7 +1,5 @@
-_target_: src.tuners.dpo_tuner.CausalLMTuner
+_target_: src.tuners.DPOCausalLMTuner
 hparams:
-  pretrained_model_name:
-    - meta-llama/Meta-Llama-3.1-8B-Instruct
   dpo_beta:
     low: 1e-2
     high: 1.0
@@ -24,6 +22,7 @@ hparams:
     log: False
 
 module_params:
+  pretrained_model_name: ${pretrained_model_name}
   is_sft: ${is_sft}
   is_preprocessed: ${is_preprocessed}
   custom_data_encoder_path: ${custom_data_encoder_path}
@@ -64,7 +63,7 @@ module_params:
   patience: ${patience}
   min_delta: ${min_delta}
 
-direction: minimize
+tracking_direction: ${tracking_direction}
 seed: ${seed}
 num_trials: ${num_trials}
 hparams_save_path: ${hparams_save_path}

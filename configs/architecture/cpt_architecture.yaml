@@ -1,7 +1,7 @@
-_target_: src.architectures.cpt_architecture.CausalLMArchitecture
+_target_: src.architectures.CPTCausalLMArchitecture
 
 model:
-  _target_: src.architectures.models.huggingface_model.HuggingFaceModel
+  _target_: src.architectures.HuggingFaceModel
   pretrained_model_name: ${pretrained_model_name}
   is_preprocessed: ${is_preprocessed}
   custom_data_encoder_path: ${custom_data_encoder_path}

@@ -17,7 +17,7 @@ import json
 import hydra
 from omegaconf import OmegaConf, DictConfig
 
-from src.pipelines.pipeline import train, test, predict, tune
+from src.pipelines import *
 
 
 @hydra.main(

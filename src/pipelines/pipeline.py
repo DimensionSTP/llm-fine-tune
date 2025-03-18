@@ -1,3 +1,4 @@
+from typing import Union
 import os
 
 from hydra.utils import instantiate
@@ -8,8 +9,8 @@ from lightning.pytorch.utilities.deepspeed import (
     convert_zero_checkpoint_to_fp32_state_dict,
 )
 
-from ..utils.setup import SetUp
-from ..tuners.cpt_tuner import CausalLMTuner
+from ..utils import SetUp
+from ..tuners import *
 
 
 def train(
@@ -317,12 +318,15 @@ def tune(
 
     train_loader = setup.get_train_loader()
     val_loader = setup.get_val_loader()
+    callback_candidates = setup.get_callbacks()
+    callbacks = callback_candidates["early_stopping"]
     logger = setup.get_wandb_logger()
 
-    tuner: CausalLMTuner = instantiate(
+    tuner: Union[CPTCausalLMTuner, DPOCausalLMTuner] = instantiate(
         config.tuner,
         train_loader=train_loader,
         val_loader=val_loader,
+        callbacks=callbacks,
         logger=logger,
     )
     tuner()
