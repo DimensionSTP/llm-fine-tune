@@ -112,6 +112,8 @@ class StructuralDataset(Dataset):
             label=self.choices[idx],
         )
         encoded_choice = self.encode_text(data=prompt_choice)
+        if self.is_sft:
+            encoded_choice = self.add_sft_label(encoded=encoded_choice)
         if "token_type_ids" in encoded_choice.keys():
             del encoded_choice["token_type_ids"]
 
