@@ -1,4 +1,4 @@
-_target_: src.tuners.cpt_tuner.CausalLMTuner
+_target_: src.tuners.CPTCausalLMTuner
 hparams:
   pretrained_model_name:
     - meta-llama/Meta-Llama-3.1-8B-Instruct
