@@ -239,26 +239,61 @@ class StructuralDataset(Dataset):
         )
 
         encoded = {k: v.squeeze(0) for k, v in encoded.items()}
+        return encoded
 
-        if self.is_sft:
-            encoded["labels"] = encoded["input_ids"].clone()
-            try:
-                response_start_idx = None
-                for i in range(
-                    len(encoded["input_ids"]) - len(self.response_template_tokens) + 1
-                ):
-                    if all(
-                        encoded["input_ids"][i + j] == self.response_template_tokens[j]
-                        for j in range(len(self.response_template_tokens))
-                    ):
-                        response_start_idx = i
-                        break
-                if response_start_idx is not None:
-                    encoded["labels"][
-                        : response_start_idx + len(self.response_template_tokens)
-                    ] = self.ignore_index
-            except StopIteration:
-                pass
+    def find_pattern_indices(
+        self,
+        input_ids: torch.Tensor,
+        pattern: torch.Tensor,
+    ) -> List[int]:
+        pattern_length = pattern.size(0)
+
+        if pattern_length > input_ids.size(0):
+            return []
+
+        indices = []
+        for i in range(input_ids.size(0) - pattern_length + 1):
+            if torch.equal(input_ids[i : i + pattern_length], pattern):
+                indices.append(i)
+        return indices
+
+    def add_sft_label(
+        self,
+        encoded: Dict[str, torch.Tensor],
+    ) -> Dict[str, torch.Tensor]:
+        input_ids = encoded["input_ids"]
+        labels = torch.full_like(
+            input_ids,
+            self.ignore_index,
+        )
+
+        start_indices = self.find_pattern_indices(
+            input_ids=input_ids,
+            pattern=self.response_start_tokens,
+        )
+        end_indices = self.find_pattern_indices(
+            input_ids=input_ids,
+            pattern=self.response_end_tokens,
+        )
+
+        end_idx_pos = 0
+        for start_idx in start_indices:
+            content_start = start_idx + len(self.response_start_tokens)
+
+            while end_idx_pos < len(end_indices):
+                if end_indices[end_idx_pos] > start_idx:
+                    content_end = end_indices[end_idx_pos]
+                    labels[content_start:content_end] = input_ids[
+                        content_start:content_end
+                    ]
+                    end_idx_pos += 1
+                    break
+                end_idx_pos += 1
+
+            else:
+                labels[content_start:] = input_ids[content_start:]
+
+        encoded["labels"] = labels
         return encoded
 
 
