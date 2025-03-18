@@ -1,3 +1,4 @@
+from typing import Union
 import os
 
 from hydra.utils import instantiate
@@ -319,7 +320,7 @@ def tune(
     val_loader = setup.get_val_loader()
     logger = setup.get_wandb_logger()
 
-    tuner: CausalLMTuner = instantiate(
+    tuner: Union[CPTCausalLMTuner, DPOCausalLMTuner] = instantiate(
         config.tuner,
         train_loader=train_loader,
         val_loader=val_loader,
