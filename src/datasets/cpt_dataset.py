@@ -1,4 +1,5 @@
 from typing import Dict, Any, List
+import os
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -16,11 +17,16 @@ class StructuralDataset(Dataset):
         split: str,
         split_ratio: float,
         seed: int,
+        dataset_name: str,
+        dataset_format: str,
         is_sft: bool,
         is_preprocessed: bool,
         instruction_column_name: str,
         data_column_name: str,
         target_column_name: str,
+        role_column_name: str,
+        content_column_name: str,
+        assistant_column_name: str,
         num_devices: int,
         batch_size: int,
         pretrained_model_name: str,
@@ -34,11 +40,16 @@ class StructuralDataset(Dataset):
         self.split = split
         self.split_ratio = split_ratio
         self.seed = seed
+        self.dataset_name = dataset_name
+        self.dataset_format = dataset_format
         self.is_sft = is_sft
         self.is_preprocessed = is_preprocessed
         self.instruction_column_name = instruction_column_name
         self.data_column_name = data_column_name
         self.target_column_name = target_column_name
+        self.role_column_name = role_column_name
+        self.content_column_name = content_column_name
+        self.assistant_column_name = assistant_column_name
         self.num_devices = num_devices
         self.batch_size = batch_size
         self.pretrained_model_name = pretrained_model_name
