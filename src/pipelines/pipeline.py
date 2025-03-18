@@ -23,7 +23,16 @@ def train(
     train_loader = setup.get_train_loader()
     val_loader = setup.get_val_loader()
     architecture = setup.get_architecture()
-    callbacks = setup.get_callbacks()
+    callback_candidates = setup.get_callbacks()
+    if config.early_stop:
+        callbacks = [
+            callback_candidates["model_checkpoint"],
+            callback_candidates["early_stopping"],
+        ]
+    else:
+        callbacks = [
+            callback_candidates["model_checkpoint"],
+        ]
     logger = setup.get_wandb_logger()
 
     logged_hparams = {}
@@ -116,7 +125,16 @@ def test(
 
     test_loader = setup.get_test_loader()
     architecture = setup.get_architecture()
-    callbacks = setup.get_callbacks()
+    callback_candidates = setup.get_callbacks()
+    if config.early_stop:
+        callbacks = [
+            callback_candidates["model_checkpoint"],
+            callback_candidates["early_stopping"],
+        ]
+    else:
+        callbacks = [
+            callback_candidates["model_checkpoint"],
+        ]
     logger = setup.get_wandb_logger()
 
     logged_hparams = {}
@@ -203,7 +221,16 @@ def predict(
 
     predict_loader = setup.get_predict_loader()
     architecture = setup.get_architecture()
-    callbacks = setup.get_callbacks()
+    callback_candidates = setup.get_callbacks()
+    if config.early_stop:
+        callbacks = [
+            callback_candidates["model_checkpoint"],
+            callback_candidates["early_stopping"],
+        ]
+    else:
+        callbacks = [
+            callback_candidates["model_checkpoint"],
+        ]
     logger = setup.get_wandb_logger()
 
     logged_hparams = {}
