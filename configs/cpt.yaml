@@ -77,6 +77,10 @@ options:
 monitor: val_loss
 tracking_direction: min
 
+early_stop: False
+patience: 2
+min_delta: 0
+
 devices: ${oc.decode:${oc.env:DEVICES}}
 accelerator: gpu
 strategy: deepspeed_stage_3_offload
