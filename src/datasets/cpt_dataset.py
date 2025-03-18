@@ -119,48 +119,45 @@ class StructuralDataset(Dataset):
         }
 
     def get_dataset(self) -> Dict[str, List[Any]]:
-        if self.split in ["train", "val"]:
-            parquet_path = f"{self.data_path}/train.parquet"
-            data = pd.read_parquet(parquet_path)
+        if self.split in ["train", "val", "test", "predict"]:
+            file_name = f"{self.dataset_name}.{self.dataset_format}"
+            full_data_path = os.path.join(
+                self.data_path,
+                file_name,
+            )
+            data = pd.read_parquet(full_data_path)
             data = data.fillna("_")
-            train_data, val_data = train_test_split(
+        else:
+            raise ValueError(f"Inavalid split: {self.split}")
+
+        if self.split == "val":
+            _, val_data = train_test_split(
                 data,
                 test_size=self.split_ratio,
                 random_state=self.seed,
                 shuffle=True,
             )
-            if self.split == "train":
-                data = train_data
-            else:
-                data = val_data
-        elif self.split == "test":
-            parquet_path = f"{self.data_path}/{self.split}.parquet"
-            data = pd.read_parquet(parquet_path)
-            data = data.fillna("_")
-        elif self.split == "predict":
-            parquet_path = f"{self.data_path}/test.parquet"
-            data = pd.read_parquet(parquet_path)
-            data = data.fillna("_")
-            if self.num_devices > 1:
-                last_row = data.iloc[-1]
-                total_batch_size = self.num_devices * self.batch_size
-                remainder = (len(data) % total_batch_size) % self.num_devices
-                if remainder != 0:
-                    num_dummies = self.num_devices - remainder
-                    repeated_rows = pd.DataFrame([last_row] * num_dummies)
-                    repeated_rows.reset_index(
-                        drop=True,
-                        inplace=True,
-                    )
-                    data = pd.concat(
-                        [
-                            data,
-                            repeated_rows,
-                        ],
-                        ignore_index=True,
-                    )
-        else:
-            raise ValueError(f"Inavalid split: {self.split}")
+            data = val_data
+
+        if self.split == "predict" and self.num_devices > 1:
+            last_row = data.iloc[-1]
+            total_batch_size = self.num_devices * self.batch_size
+            remainder = (len(data) % total_batch_size) % self.num_devices
+            if remainder != 0:
+                num_dummies = self.num_devices - remainder
+                repeated_rows = pd.DataFrame([last_row] * num_dummies)
+                repeated_rows.reset_index(
+                    drop=True,
+                    inplace=True,
+                )
+                data = pd.concat(
+                    [
+                        data,
+                        repeated_rows,
+                    ],
+                    ignore_index=True,
+                )
+
         instructions = (
             data[self.instruction_column_name].apply(lambda x: x.strip()).tolist()
         )
@@ -179,25 +176,25 @@ class StructuralDataset(Dataset):
         label: str,
     ) -> str:
         if self.is_sft:
-            label = f"{self.response_template}{label}"
+            label = f"\n{self.response_start_template}\n{label}\n{self.response_end_template}\n"
 
         conversation = [
             {
-                "role": "system",
-                "content": instruction,
+                self.role_column_name: "system",
+                self.content_column_name: instruction,
             },
             {
-                "role": "user",
-                "content": data,
+                self.role_column_name: "user",
+                self.content_column_name: data,
+            },
+            {
+                self.role_column_name: self.assistant_column_name,
+                self.content_column_name: label,
             },
         ]
-        if self.split != "predict":
-            conversation.append(
-                {
-                    "role": "assistant",
-                    "content": label,
-                }
-            )
+
+        if self.split == "predict":
+            conversation.pop()
 
         prompt = self.data_encoder.apply_chat_template(
             conversation=conversation,
