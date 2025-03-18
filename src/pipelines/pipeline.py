@@ -8,8 +8,8 @@ from lightning.pytorch.utilities.deepspeed import (
     convert_zero_checkpoint_to_fp32_state_dict,
 )
 
-from ..utils.setup import SetUp
-from ..tuners.cpt_tuner import CausalLMTuner
+from ..utils import SetUp
+from ..tuners import *
 
 
 def train(
