@@ -35,6 +35,10 @@ is_preprocessed: False
 instruction_column_name: instruction
 data_column_name: input
 target_column_name: response
+conversation_column_name: messages
+role_column_name: role
+content_column_name: content
+assistant_column_name: assistant
 upload_user: meta-llama
 model_type: Llama-3.1-8B-Instruct
 pretrained_model_name: ${upload_user}/${model_type}
