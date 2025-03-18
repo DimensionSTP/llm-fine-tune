@@ -27,6 +27,9 @@ workers_ratio: 8
 use_all_workers: False
 
 split_ratio: 1e-2
+
+dataset_name: open-Korean
+dataset_format: parquet
 is_sft: False
 is_preprocessed: False
 instruction_column_name: instruction
@@ -84,7 +87,6 @@ epoch: 5
 step: 1e+2
 
 model_name: CausalLM-DPO
-dataset_name: open-Korean
 mode: train
 
 is_tuned: untuned
