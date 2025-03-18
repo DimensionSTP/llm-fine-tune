@@ -318,12 +318,15 @@ def tune(
 
     train_loader = setup.get_train_loader()
     val_loader = setup.get_val_loader()
+    callback_candidates = setup.get_callbacks()
+    callbacks = callback_candidates["early_stopping"]
     logger = setup.get_wandb_logger()
 
     tuner: Union[CPTCausalLMTuner, DPOCausalLMTuner] = instantiate(
         config.tuner,
         train_loader=train_loader,
         val_loader=val_loader,
+        callbacks=callbacks,
         logger=logger,
     )
     tuner()
