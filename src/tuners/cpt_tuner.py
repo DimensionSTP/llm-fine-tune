@@ -30,6 +30,7 @@ class CausalLMTuner:
         hparams_save_path: str,
         train_loader: DataLoader,
         val_loader: DataLoader,
+        callbacks: EarlyStopping,
         logger: WandbLogger,
     ) -> None:
         self.hparams = hparams
@@ -40,6 +41,7 @@ class CausalLMTuner:
         self.hparams_save_path = hparams_save_path
         self.train_loader = train_loader
         self.val_loader = val_loader
+        self.callbacks = callbacks
         self.logger = logger
 
     def __call__(self) -> None:
@@ -147,12 +149,6 @@ class CausalLMTuner:
         )
 
         self.logger.log_hyperparams(params)
-        callbacks = EarlyStopping(
-            monitor=self.module_params.monitor,
-            mode=self.module_params.mode,
-            patience=self.module_params.patience,
-            min_delta=self.module_params.min_delta,
-        )
 
         trainer = Trainer(
             devices=self.module_params.devices,
@@ -165,7 +161,7 @@ class CausalLMTuner:
             gradient_clip_algorithm=self.module_params.gradient_clip_algorithm,
             max_epochs=self.module_params.max_epochs,
             enable_checkpointing=False,
-            callbacks=callbacks,
+            callbacks=self.callbacks,
             logger=self.logger,
         )
 
