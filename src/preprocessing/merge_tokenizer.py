@@ -42,11 +42,10 @@ def merge_tokenizer(
     new_tokens = new_tokens[:max_multiple_of_128]
     tokenizer.add_tokens(new_tokens)
 
-    if not os.path.exists(config.custom_data_encoder_path):
-        os.makedirs(
-            config.custom_data_encoder_path,
-            exist_ok=True,
-        )
+    os.makedirs(
+        config.custom_data_encoder_path,
+        exist_ok=True,
+    )
     tokenizer.save_pretrained(config.custom_data_encoder_path)
 
 
