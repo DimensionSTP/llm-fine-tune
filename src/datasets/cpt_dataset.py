@@ -109,6 +109,8 @@ class StructuralDataset(Dataset):
             label=self.labels[idx],
         )
         encoded = self.encode_text(data=prompt)
+        if self.is_sft:
+            encoded = self.add_sft_label(encoded=encoded)
         if "token_type_ids" in encoded.keys():
             del encoded["token_type_ids"]
         return {
