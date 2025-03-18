@@ -1,3 +1,4 @@
+from typing import Dict, Union
 import os
 
 from omegaconf import DictConfig
@@ -83,7 +84,7 @@ class SetUp:
         )
         return architecture
 
-    def get_callbacks(self) -> List[Any]:
+    def get_callbacks(self) -> Dict[str, Union[ModelCheckpoint, EarlyStopping]]:
         model_checkpoint: ModelCheckpoint = instantiate(
             self.config.callbacks.model_checkpoint,
         )
