@@ -81,11 +81,19 @@ class StructuralDataset(Dataset):
         self.labels = dataset["labels"]
         self.data_max_length = data_max_length
         self.target_max_length = target_max_length
-        self.response_template = "### Response:\n"
-        self.response_template_tokens = self.data_encoder(
-            self.response_template,
+
+        self.response_start_template = "### Start"
+        self.response_start_tokens = self.data_encoder(
+            self.response_start_template,
+            return_tensors="pt",
             add_special_tokens=False,
-        )["input_ids"]
+        )["input_ids"].squeeze(0)
+        self.response_end_template = "### End"
+        self.response_end_tokens = self.data_encoder(
+            self.response_end_template,
+            return_tensors="pt",
+            add_special_tokens=False,
+        )["input_ids"].squeeze(0)
         self.ignore_index = -100
 
     def __len__(self) -> int:
