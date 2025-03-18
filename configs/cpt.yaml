@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - dataset: cpt_structural_dataset
+  - dataset: cpt_dataset
   - architecture: cpt_architecture
   - tuner: cpt_tuner
   - logger: wandb
