@@ -12,7 +12,9 @@ package_name: llm-fine-tune
 project_dir: ${oc.env:PROJECT_DIR}/${package_name}
 connected_dir: ${oc.env:CONNECTED_DIR}/${package_name}
 
-seed: 2024
+seed: 2025
+
+data_type: structural
 
 split:
   train: train
