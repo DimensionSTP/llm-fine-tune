@@ -1,6 +1,6 @@
 # @package _global_
 defaults:
-  - dataset: dpo_structural_dataset
+  - dataset: dpo_dataset
   - architecture: dpo_architecture
   - tuner: dpo_tuner
   - logger: wandb
