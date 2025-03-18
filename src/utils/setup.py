@@ -17,6 +17,7 @@ class SetUp:
         config: DictConfig,
     ) -> None:
         self.config = config
+        self.data_type = self.config.data_type
         self.num_cpus = os.cpu_count()
         self.num_fit_workers = min(
             self.num_cpus,
@@ -28,7 +29,7 @@ class SetUp:
 
     def get_train_loader(self) -> DataLoader:
         train_dataset: Dataset = instantiate(
-            self.config.dataset,
+            self.config.dataset[self.data_type],
             split=self.config.split.train,
         )
         return DataLoader(
@@ -41,7 +42,7 @@ class SetUp:
 
     def get_val_loader(self) -> DataLoader:
         val_dataset: Dataset = instantiate(
-            self.config.dataset,
+            self.config.dataset[self.data_type],
             split=self.config.split.val,
         )
         return DataLoader(
@@ -54,7 +55,7 @@ class SetUp:
 
     def get_test_loader(self) -> DataLoader:
         test_dataset: Dataset = instantiate(
-            self.config.dataset,
+            self.config.dataset[self.data_type],
             split=self.config.split.test,
         )
         return DataLoader(
@@ -67,7 +68,7 @@ class SetUp:
 
     def get_predict_loader(self) -> DataLoader:
         predict_dataset: Dataset = instantiate(
-            self.config.dataset,
+            self.config.dataset[self.data_type],
             split=self.config.split.predict,
         )
         return DataLoader(
