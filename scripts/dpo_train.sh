@@ -10,6 +10,8 @@ model_type="Llama-3.1-8B-Instruct"
 left_padding=False
 quantization_type="origin"
 peft_type="origin"
+data_type="structural"
+dataset_name="open-Korean"
 data_max_length=2048
 target_max_length=2048
 precision="bf16"
@@ -36,6 +38,8 @@ python main.py --config-name=dpo.yaml mode=train \
     left_padding=$left_padding \
     quantization_type=$quantization_type \
     peft_type=$peft_type \
+    data_type=$data_type \
+    dataset_name=$dataset_name \
     data_max_length=$data_max_length \
     target_max_length=$target_max_length \
     precision=$precision \
