@@ -24,7 +24,7 @@ class CausalLMTuner:
         self,
         hparams: Dict[str, Any],
         module_params: Dict[str, Any],
-        direction: str,
+        tracking_direction: str,
         seed: int,
         num_trials: int,
         hparams_save_path: str,
@@ -34,7 +34,7 @@ class CausalLMTuner:
     ) -> None:
         self.hparams = hparams
         self.module_params = module_params
-        self.direction = direction
+        self.direction = f"{tracking_direction}imize"
         self.seed = seed
         self.num_trials = num_trials
         self.hparams_save_path = hparams_save_path
