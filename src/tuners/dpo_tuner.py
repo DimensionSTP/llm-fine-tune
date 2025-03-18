@@ -79,11 +79,6 @@ class CausalLMTuner:
 
         params = dict()
         params["seed"] = self.seed
-        if self.hparams.pretrained_model_name:
-            params["pretrained_model_name"] = trial.suggest_categorical(
-                name="pretrained_model_name",
-                choices=self.hparams.pretrained_model_name,
-            )
         if self.hparams.dpo_beta:
             params["dpo_beta"] = trial.suggest_float(
                 name="dpo_beta",
@@ -121,7 +116,7 @@ class CausalLMTuner:
             )
 
         model = HuggingFaceModel(
-            pretrained_model_name=params["pretrained_model_name"],
+            pretrained_model_name=self.module_params.pretrained_model_name,
             is_preprocessed=self.module_params.is_preprocessed,
             custom_data_encoder_path=self.module_params.custom_data_encoder_path,
             left_padding=self.module_params.left_padding,
@@ -137,7 +132,7 @@ class CausalLMTuner:
         )
         architecture = DPOCausalLMArchitecture(
             model=model,
-            pretrained_model_name=params["pretrained_model_name"],
+            pretrained_model_name=self.module_params.pretrained_model_name,
             is_sft=self.module_params.is_sft,
             is_preprocessed=self.module_params.is_preprocessed,
             custom_data_encoder_path=self.module_params.custom_data_encoder_path,
