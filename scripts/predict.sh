@@ -15,6 +15,7 @@ data_max_length=2048
 target_max_length=2048
 precision="bf16"
 batch_size=16
+eval_batch_size=16
 accumulate_grad_batches=8
 workers_ratio=8
 use_all_workers=False
@@ -38,6 +39,7 @@ do
         target_max_length=$target_max_length \
         precision=$precision \
         batch_size=$batch_size \
+        eval_batch_size=$eval_batch_size \
         accumulate_grad_batches=$accumulate_grad_batches \
         workers_ratio=$workers_ratio \
         use_all_workers=$use_all_workers \
@@ -61,6 +63,7 @@ do
         target_max_length=$target_max_length \
         precision=$precision \
         batch_size=$batch_size \
+        eval_batch_size=$eval_batch_size \
         accumulate_grad_batches=$accumulate_grad_batches \
         workers_ratio=$workers_ratio \
         use_all_workers=$use_all_workers \

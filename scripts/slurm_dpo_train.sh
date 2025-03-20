@@ -27,6 +27,7 @@ data_max_length=2048
 target_max_length=2048
 precision="bf16"
 batch_size=4
+eval_batch_size=4
 accumulate_grad_batches=4
 dpo_beta=0.5
 lr=3e-7
@@ -55,6 +56,7 @@ python main.py --config-name=dpo.yaml mode=train \
     target_max_length=$target_max_length \
     precision=$precision \
     batch_size=$batch_size \
+    eval_batch_size=$eval_batch_size \
     accumulate_grad_batches=$accumulate_grad_batches \
     dpo_beta=$dpo_beta \
     lr=$lr \
