@@ -123,6 +123,10 @@ upload_tag: open-Korean
 num_safetensors: 10
 
 korean_model_name: beomi/OPEN-SOLAR-KO-10.7B
+reasoning_model_name: Qwen/QwQ-32B
+reasoning_tokens:
+  - <think>
+  - </think>
 
 run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}
