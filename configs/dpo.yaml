@@ -106,6 +106,7 @@ project_name: ${model_name}-${dataset_name}-${mode}
 total_batch_size: bs=${batch_size}x${devices}x${accumulate_grad_batches}
 length_info: data_max_length=${data_max_length}-target_max_length=${target_max_length}
 save_detail: ${upload_user}_${model_type}-is_sft=${is_sft}-quantization_type=${quantization_type}-peft_type=${peft_type}-${length_info}-precision=${precision}-${total_batch_size}
+convert_at_end: False
 resumed_step: 0
 ckpt_path: ${callbacks.model_checkpoint.dirpath}/step=${step}.ckpt
 
