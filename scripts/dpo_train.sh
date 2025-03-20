@@ -27,6 +27,7 @@ epoch=5
 step=1e+2
 workers_ratio=8
 use_all_workers=False
+convert_at_end=False
 
 python main.py --config-name=dpo.yaml mode=train \
     split_ratio=$split_ratio \
@@ -55,4 +56,5 @@ python main.py --config-name=dpo.yaml mode=train \
     epoch=$epoch \
     step=$step \
     workers_ratio=$workers_ratio \
-    use_all_workers=$use_all_workers
+    use_all_workers=$use_all_workers \
+    convert_at_end=$convert_at_end
