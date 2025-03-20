@@ -22,10 +22,8 @@ def specialize_reasoning(
 
     reasoning_chat_template = reasoning_tokenizer.chat_template
 
-    tokenizer.add_tokens(
-        config.reasoning_tokens,
-        special=False,
-    )
+    for reasoning_token in config.reasoning_tokens:
+        tokenizer.add_tokens(reasoning_token)
 
     special_tokens_map = tokenizer.special_tokens_map
     assistant_start = special_tokens_map.get(
