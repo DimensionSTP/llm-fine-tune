@@ -102,7 +102,7 @@ def train(
         )
         raise e
 
-    if config.strategy.startswith("deepspeed"):
+    if config.strategy.startswith("deepspeed") and config.convert_at_end:
         for root, dirs, _ in os.walk(config.callbacks.model_checkpoint.dirpath):
             for dir_name in dirs:
                 if dir_name.endswith(".ckpt"):
