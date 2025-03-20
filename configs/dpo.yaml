@@ -2,6 +2,7 @@
 defaults:
   - dataset: dpo_dataset
   - architecture: dpo_architecture
+  - architecture/model: huggingface_model
   - tuner: dpo_tuner
   - logger: wandb
   - hydra: hydra
