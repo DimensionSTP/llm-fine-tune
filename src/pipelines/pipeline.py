@@ -324,9 +324,12 @@ def tune(
 
     tuner: Union[CPTCausalLMTuner, DPOCausalLMTuner] = instantiate(
         config.tuner,
+        architecture_config=config.architecture,
+        trainer_config=config.trainer,
         train_loader=train_loader,
         val_loader=val_loader,
         callbacks=callbacks,
         logger=logger,
+        _recursive_=False,
     )
     tuner()
