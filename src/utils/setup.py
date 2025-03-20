@@ -47,7 +47,7 @@ class SetUp:
         )
         return DataLoader(
             dataset=val_dataset,
-            batch_size=self.config.batch_size,
+            batch_size=self.config.eval_batch_size,
             shuffle=False,
             num_workers=self.num_workers,
             pin_memory=True,
@@ -60,7 +60,7 @@ class SetUp:
         )
         return DataLoader(
             dataset=test_dataset,
-            batch_size=self.config.batch_size,
+            batch_size=self.config.eval_batch_size,
             shuffle=False,
             num_workers=self.num_workers,
             pin_memory=True,
@@ -73,7 +73,7 @@ class SetUp:
         )
         return DataLoader(
             dataset=predict_dataset,
-            batch_size=self.config.batch_size,
+            batch_size=self.config.eval_batch_size,
             shuffle=False,
             num_workers=self.num_workers,
             pin_memory=True,

@@ -2,6 +2,7 @@
 defaults:
   - dataset: dpo_dataset
   - architecture: dpo_architecture
+  - architecture/model: huggingface_model
   - tuner: dpo_tuner
   - logger: wandb
   - hydra: hydra
@@ -23,6 +24,7 @@ split:
   predict: predict
 
 batch_size: 4
+eval_batch_size: 4
 workers_ratio: 8
 use_all_workers: False
 
@@ -71,6 +73,7 @@ lr: 3e-7
 weight_decay: 1e-1
 warmup_ratio: 5e-2
 eta_min_ratio: 1e-2
+interval: step
 options:
   return_dict_in_generate: True
   output_scores: True
@@ -105,6 +108,7 @@ project_name: ${model_name}-${dataset_name}-${mode}
 total_batch_size: bs=${batch_size}x${devices}x${accumulate_grad_batches}
 length_info: data_max_length=${data_max_length}-target_max_length=${target_max_length}
 save_detail: ${upload_user}_${model_type}-is_sft=${is_sft}-quantization_type=${quantization_type}-peft_type=${peft_type}-${length_info}-precision=${precision}-${total_batch_size}
+convert_at_end: False
 resumed_step: 0
 ckpt_path: ${callbacks.model_checkpoint.dirpath}/step=${step}.ckpt
 
@@ -120,6 +124,10 @@ upload_tag: open-Korean
 num_safetensors: 10
 
 korean_model_name: beomi/OPEN-SOLAR-KO-10.7B
+reasoning_model_name: Qwen/QwQ-32B
+reasoning_tokens:
+  - <think>
+  - </think>
 
 run_name: ${project_name}
 work_dir: ${hydra:runtime.cwd}

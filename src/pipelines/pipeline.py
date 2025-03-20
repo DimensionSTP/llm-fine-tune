@@ -102,7 +102,7 @@ def train(
         )
         raise e
 
-    if config.strategy.startswith("deepspeed"):
+    if config.strategy.startswith("deepspeed") and config.convert_at_end:
         for root, dirs, _ in os.walk(config.callbacks.model_checkpoint.dirpath):
             for dir_name in dirs:
                 if dir_name.endswith(".ckpt"):
@@ -324,9 +324,12 @@ def tune(
 
     tuner: Union[CPTCausalLMTuner, DPOCausalLMTuner] = instantiate(
         config.tuner,
+        architecture_config=config.architecture,
+        trainer_config=config.trainer,
         train_loader=train_loader,
         val_loader=val_loader,
         callbacks=callbacks,
         logger=logger,
+        _recursive_=False,
     )
     tuner()
