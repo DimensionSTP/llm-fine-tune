@@ -71,6 +71,7 @@ lr: 3e-5
 weight_decay: 1e-1
 warmup_ratio: 5e-2
 eta_min_ratio: 1e-2
+interval: step
 options:
   return_dict_in_generate: True
   output_scores: True
