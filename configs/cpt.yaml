@@ -24,6 +24,7 @@ split:
   predict: predict
 
 batch_size: 16
+eval_batch_size: 16
 workers_ratio: 8
 use_all_workers: False
 
