@@ -11,7 +11,7 @@ lr: ${lr}
 weight_decay: ${weight_decay}
 warmup_ratio: ${warmup_ratio}
 eta_min_ratio: ${eta_min_ratio}
-interval: step
+interval: ${interval}
 options: ${options}
 target_max_length: ${target_max_length}
 target_min_length: ${target_min_length}
