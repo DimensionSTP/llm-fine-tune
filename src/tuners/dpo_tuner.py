@@ -2,6 +2,9 @@ from typing import Dict, Any
 import os
 import json
 
+from omegaconf import DictConfig
+from hydra.utils import instantiate
+
 from torch.utils.data import DataLoader
 
 from lightning.pytorch import Trainer, seed_everything
@@ -12,10 +15,6 @@ import optuna
 from optuna.samplers import TPESampler
 from optuna.pruners import HyperbandPruner
 
-from transformers import BitsAndBytesConfig
-from peft import LoraConfig
-
-from ..architectures import HuggingFaceModel
 from ..architectures import DPOCausalLMArchitecture
 
 
@@ -23,22 +22,26 @@ class CausalLMTuner:
     def __init__(
         self,
         hparams: Dict[str, Any],
-        module_params: Dict[str, Any],
         tracking_direction: str,
         seed: int,
         num_trials: int,
         hparams_save_path: str,
+        architecture_config: DictConfig,
+        trainer_config: DictConfig,
         train_loader: DataLoader,
         val_loader: DataLoader,
         callbacks: EarlyStopping,
         logger: WandbLogger,
     ) -> None:
         self.hparams = hparams
-        self.module_params = module_params
         self.direction = f"{tracking_direction}imize"
         self.seed = seed
         self.num_trials = num_trials
         self.hparams_save_path = hparams_save_path
+
+        self.architecture_config = architecture_config
+        self.trainer_config = trainer_config
+
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.callbacks = callbacks
@@ -79,93 +82,56 @@ class CausalLMTuner:
 
         params = dict()
         params["seed"] = self.seed
+        params["architecture"] = dict()
         if self.hparams.dpo_beta:
-            params["dpo_beta"] = trial.suggest_float(
+            params["architecture"]["dpo_beta"] = trial.suggest_float(
                 name="dpo_beta",
                 low=self.hparams.dpo_beta.low,
                 high=self.hparams.dpo_beta.high,
                 log=self.hparams.dpo_beta.log,
             )
         if self.hparams.lr:
-            params["lr"] = trial.suggest_float(
+            params["architecture"]["lr"] = trial.suggest_float(
                 name="lr",
                 low=self.hparams.lr.low,
                 high=self.hparams.lr.high,
                 log=self.hparams.lr.log,
             )
         if self.hparams.weight_decay:
-            params["weight_decay"] = trial.suggest_float(
+            params["architecture"]["weight_decay"] = trial.suggest_float(
                 name="weight_decay",
                 low=self.hparams.weight_decay.low,
                 high=self.hparams.weight_decay.high,
                 log=self.hparams.weight_decay.log,
             )
         if self.hparams.warmup_ratio:
-            params["warmup_ratio"] = trial.suggest_float(
+            params["architecture"]["warmup_ratio"] = trial.suggest_float(
                 name="warmup_ratio",
                 low=self.hparams.warmup_ratio.low,
                 high=self.hparams.warmup_ratio.high,
                 log=self.hparams.warmup_ratio.log,
             )
         if self.hparams.eta_min_ratio:
-            params["eta_min_ratio"] = trial.suggest_float(
+            params["architecture"]["eta_min_ratio"] = trial.suggest_float(
                 name="eta_min_ratio",
                 low=self.hparams.eta_min_ratio.low,
                 high=self.hparams.eta_min_ratio.high,
                 log=self.hparams.eta_min_ratio.log,
             )
 
-        model = HuggingFaceModel(
-            pretrained_model_name=self.module_params.pretrained_model_name,
-            is_preprocessed=self.module_params.is_preprocessed,
-            custom_data_encoder_path=self.module_params.custom_data_encoder_path,
-            left_padding=self.module_params.left_padding,
-            merged_model_path=self.module_params.merged_model_path,
-            precision=self.module_params.precision,
-            mode=self.module_params.model_execution_mode,
-            quantization_type=self.module_params.quantization_type,
-            quantization_config=BitsAndBytesConfig(
-                **self.module_params.quantization_config
-            ),
-            peft_type=self.module_params.peft_type,
-            peft_config=LoraConfig(**self.module_params.peft_config),
-        )
-        architecture = DPOCausalLMArchitecture(
-            model=model,
-            pretrained_model_name=self.module_params.pretrained_model_name,
-            is_sft=self.module_params.is_sft,
-            is_preprocessed=self.module_params.is_preprocessed,
-            custom_data_encoder_path=self.module_params.custom_data_encoder_path,
-            left_padding=self.module_params.left_padding,
-            dpo_beta=params["dpo_beta"],
-            strategy=self.module_params.strategy,
-            lr=params["lr"],
-            weight_decay=params["weight_decay"],
-            warmup_ratio=params["warmup_ratio"],
-            eta_min_ratio=params["eta_min_ratio"],
-            interval=self.module_params.interval,
-            options=self.module_params.options,
-            target_max_length=self.module_params.target_max_length,
-            target_min_length=self.module_params.target_min_length,
-            per_device_save_path=self.module_params.per_device_save_path,
-            chosen_column_name=self.module_params.chosen_column_name,
+        architecture: DPOCausalLMArchitecture = instantiate(
+            self.architecture_config,
+            **params["architecture"],
         )
 
         self.logger.log_hyperparams(params)
 
-        trainer = Trainer(
-            devices=self.module_params.devices,
-            accelerator=self.module_params.accelerator,
-            strategy=self.module_params.strategy,
-            log_every_n_steps=self.module_params.log_every_n_steps,
-            precision=self.module_params.precision,
-            accumulate_grad_batches=self.module_params.accumulate_grad_batches,
-            gradient_clip_val=self.module_params.gradient_clip_val,
-            gradient_clip_algorithm=self.module_params.gradient_clip_algorithm,
-            max_epochs=self.module_params.max_epochs,
+        trainer: Trainer = instantiate(
+            self.trainer_config,
             enable_checkpointing=False,
             callbacks=self.callbacks,
             logger=self.logger,
+            _convert_="partial",
         )
 
         try:
