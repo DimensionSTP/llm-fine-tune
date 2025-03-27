@@ -77,10 +77,10 @@ def prepare_upload(
                 )
             model_state_dict[k] = v
 
-    if config.precision == 32 or config.precision == "32":
+    if config.precision in [32, "32"]:
         safetensors_dtype = torch.float32
         torch_dtype = "float32"
-    elif config.precision == 16 or config.precision == "16":
+    elif config.precision in [16, "16"]:
         safetensors_dtype = torch.float16
         torch_dtype = "float16"
     elif config.precision == "bf16":
