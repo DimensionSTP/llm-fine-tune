@@ -55,9 +55,9 @@ class HuggingFaceModel(nn.Module):
                 )
 
         self.attn_implementation = None
-        if precision == 32 or precision == "32":
+        if precision in [32, "32"]:
             self.precision = torch.float32
-        elif precision == 16 or precision == "16":
+        elif precision in [16, "16"]:
             self.precision = torch.float16
             self.attn_implementation = "flash_attention_2"
         elif precision == "bf16":
