@@ -19,6 +19,8 @@ import torch
 
 from transformers import AutoModelForCausalLM, AutoTokenizer, AutoConfig
 
+from peft import get_peft_model, LoraConfig
+
 from safetensors.torch import save_file
 
 from tqdm import tqdm
@@ -96,7 +98,7 @@ def prepare_upload(
         if config.precision in [32, "32"]:
             safetensors_dtype = torch.float32
             torch_dtype = "float32"
-        elif config.precision == 16 or config.precision == "16":
+        elif config.precision in [16, "16"]:
             safetensors_dtype = torch.float16
             torch_dtype = "float16"
         elif config.precision == "bf16":
@@ -125,8 +127,30 @@ def prepare_upload(
 
         original_model = AutoModelForCausalLM.from_pretrained(model_path)
         original_model.resize_token_embeddings(len(tokenizer))
-        original_model.load_state_dict(model_state_dict)
-        state_dict = original_model.state_dict()
+
+        if config.peft_type == "lora":
+            peft_config = LoraConfig(**config.peft_config)
+            model = get_peft_model(
+                model=original_model,
+                peft_config=peft_config,
+            )
+        else:
+            model = original_model
+
+        model.load_state_dict(
+            state_dict=model_state_dict,
+            strict=False,
+        )
+
+        if config.peft_type == "lora":
+            if hasattr(model, "merge_and_unload"):
+                model = model.merge_and_unload()
+            else:
+                raise AttributeError(
+                    "The model does not have merge_and_unload method. Check your PEFT version."
+                )
+
+        state_dict = model.state_dict()
         keys = list(state_dict.keys())
         num_splits = config.num_safetensors
         split_size = len(keys) // num_splits
