@@ -1,5 +1,4 @@
 _target_: src.architectures.CPTCausalLMArchitecture
-
 model: ${model}
 pretrained_model_name: ${pretrained_model_name}
 is_sft: ${is_sft}
