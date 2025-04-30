@@ -26,6 +26,7 @@ class CausalLMTuner:
         seed: int,
         num_trials: int,
         hparams_save_path: str,
+        monitor: str,
         architecture_config: DictConfig,
         trainer_config: DictConfig,
         train_loader: DataLoader,
@@ -38,6 +39,7 @@ class CausalLMTuner:
         self.seed = seed
         self.num_trials = num_trials
         self.hparams_save_path = hparams_save_path
+        self.monitor = monitor
 
         self.architecture_config = architecture_config
         self.trainer_config = trainer_config
@@ -146,4 +148,4 @@ class CausalLMTuner:
             )
             raise e
 
-        return trainer.callback_metrics[self.module_params.monitor].item()
+        return trainer.callback_metrics[self.monitor].item()
