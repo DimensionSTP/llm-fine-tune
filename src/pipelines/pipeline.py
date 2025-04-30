@@ -45,6 +45,7 @@ def train(
             if key != "_target_":
                 logged_hparams[key] = value
     logged_hparams["batch_size"] = config.batch_size
+    logged_hparams["eval_batch_size"] = config.eval_batch_size
     logged_hparams["epoch"] = config.epoch
     logged_hparams["step"] = config.step
     logged_hparams["seed"] = config.seed
@@ -146,7 +147,7 @@ def test(
         for key, value in config.architecture["model"].items():
             if key != "_target_":
                 logged_hparams[key] = value
-    logged_hparams["batch_size"] = config.batch_size
+    logged_hparams["batch_size"] = config.eval_batch_size
     logged_hparams["epoch"] = config.epoch
     logged_hparams["step"] = config.step
     logged_hparams["seed"] = config.seed
@@ -242,7 +243,7 @@ def predict(
         for key, value in config.architecture["model"].items():
             if key != "_target_":
                 logged_hparams[key] = value
-    logged_hparams["batch_size"] = config.batch_size
+    logged_hparams["batch_size"] = config.eval_batch_size
     logged_hparams["epoch"] = config.epoch
     logged_hparams["step"] = config.step
     logged_hparams["seed"] = config.seed
