@@ -26,14 +26,14 @@ split:
 batch_size: 16
 eval_batch_size: 16
 workers_ratio: 8
-use_all_workers: False
+use_all_workers: false
 
 split_ratio: 1e-4
 
 dataset_name: open-Korean
 dataset_format: parquet
-is_sft: False
-is_preprocessed: False
+is_sft: false
+is_preprocessed: false
 instruction_column_name: instruction
 data_column_name: input
 target_column_name: response
@@ -46,7 +46,7 @@ model_type: Llama-3.1-8B-Instruct
 pretrained_model_name: ${upload_user}/${model_type}
 custom_data_encoder_path: ${connected_dir}/merged/data_encoders/${pretrained_model_name}
 reference_data_encoder_name: HuggingFaceTB/SmolLM2-135M-Instruct
-left_padding: False
+left_padding: false
 merged_model_path: ${connected_dir}/merged/models/${pretrained_model_name}
 data_max_length: 2048
 target_max_length: 2048
@@ -54,9 +54,9 @@ target_min_length: 16
 
 quantization_type: origin
 quantization_config:
-  load_in_4bit: True
+  load_in_4bit: true
   bnb_4bit_quant_type: nf4
-  bnb_4bit_use_double_quant: True
+  bnb_4bit_use_double_quant: true
   bnb_4bit_compute_dtype: bfloat16
 peft_type: origin
 peft_config:
@@ -66,7 +66,7 @@ peft_config:
   lora_dropout: 0.1
   bias: none
   task_type: CAUSAL_LM
-  inference_mode: False
+  inference_mode: false
 
 lr: 3e-5
 weight_decay: 1e-1
@@ -74,13 +74,13 @@ warmup_ratio: 5e-2
 eta_min_ratio: 1e-2
 interval: step
 options:
-  return_dict_in_generate: True
-  output_scores: True
+  return_dict_in_generate: true
+  output_scores: true
 
 monitor: val_loss
 tracking_direction: min
 
-early_stop: False
+early_stop: false
 patience: 2
 min_delta: 0
 
@@ -107,7 +107,7 @@ project_name: ${model_name}-${dataset_name}-${mode}
 total_batch_size: bs=${batch_size}x${devices}x${accumulate_grad_batches}
 length_info: data_max_length=${data_max_length}-target_max_length=${target_max_length}
 save_detail: ${upload_user}_${model_type}-is_sft=${is_sft}-quantization_type=${quantization_type}-peft_type=${peft_type}-${length_info}-precision=${precision}-${total_batch_size}
-convert_at_end: False
+convert_at_end: false
 resumed_step: 0
 ckpt_path: ${callbacks.model_checkpoint.dirpath}/step=${step}.ckpt
 

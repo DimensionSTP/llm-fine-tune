@@ -2,11 +2,11 @@ model_checkpoint:
   _target_: lightning.pytorch.callbacks.ModelCheckpoint
   every_n_train_steps: ${step}
   save_top_k: -1
-  save_last: True
-  verbose: True
+  save_last: true
+  verbose: true
   dirpath: ${connected_dir}/checkpoints/${model_name}/${dataset_name}/${is_tuned}/${strategy}/${save_detail}
   filename: step={step}
-  auto_insert_metric_name: False
+  auto_insert_metric_name: false
 
 early_stopping:
   _target_: lightning.pytorch.callbacks.EarlyStopping

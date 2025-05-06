@@ -3,19 +3,19 @@ hparams:
   lr:
     low: 5e-6
     high: 5e-5
-    log: False
+    log: false
   weight_decay:
     low: 1e-2
     high: 1e-1
-    log: False
+    log: false
   warmup_ratio:
     low: 1e-2
     high: 1e-1
-    log: False
+    log: false
   eta_min_ratio:
     low: 5e-3
     high: 5e-2
-    log: False
+    log: false
 
 tracking_direction: ${tracking_direction}
 seed: ${seed}
