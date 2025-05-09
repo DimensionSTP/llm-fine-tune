@@ -16,6 +16,7 @@ class StructuralDataset(Dataset):
         data_path: str,
         split: str,
         split_ratio: float,
+        is_strict_split: bool,
         seed: int,
         dataset_name: str,
         dataset_format: str,
@@ -39,6 +40,7 @@ class StructuralDataset(Dataset):
         self.data_path = data_path
         self.split = split
         self.split_ratio = split_ratio
+        self.is_strict_split = is_strict_split
         self.seed = seed
         self.dataset_name = dataset_name
         self.dataset_format = dataset_format
@@ -129,6 +131,15 @@ class StructuralDataset(Dataset):
             data = data.fillna("_")
         else:
             raise ValueError(f"Inavalid split: {self.split}")
+
+        if self.split == "train" and self.is_strict_split:
+            train_data, _ = train_test_split(
+                data,
+                test_size=self.split_ratio,
+                random_state=self.seed,
+                shuffle=True,
+            )
+            data = train_data
 
         if self.split == "val":
             _, val_data = train_test_split(
@@ -285,6 +296,7 @@ class ConversationalDataset(StructuralDataset):
         data_path: str,
         split: str,
         split_ratio: float,
+        is_strict_split: bool,
         seed: int,
         dataset_name: str,
         dataset_format: str,
@@ -306,6 +318,7 @@ class ConversationalDataset(StructuralDataset):
         self.data_path = data_path
         self.split = split
         self.split_ratio = split_ratio
+        self.is_strict_split = is_strict_split
         self.seed = seed
         self.dataset_name = dataset_name
         self.dataset_format = dataset_format
@@ -390,6 +403,15 @@ class ConversationalDataset(StructuralDataset):
             data = data.fillna("_")
         else:
             raise ValueError(f"Inavalid split: {self.split}")
+
+        if self.split == "train" and self.is_strict_split:
+            train_data, _ = train_test_split(
+                data,
+                test_size=self.split_ratio,
+                random_state=self.seed,
+                shuffle=True,
+            )
+            data = train_data
 
         if self.split == "val":
             _, val_data = train_test_split(
