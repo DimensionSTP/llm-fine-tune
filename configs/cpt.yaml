@@ -28,8 +28,8 @@ eval_batch_size: 16
 workers_ratio: 8
 use_all_workers: false
 
-split_ratio: 1e-4
-is_strict_split: true
+split_ratio: 1e-2
+is_strict_split: false
 
 dataset_name: open-Korean
 dataset_format: parquet
@@ -42,12 +42,13 @@ conversation_column_name: messages
 role_column_name: role
 content_column_name: content
 assistant_column_name: assistant
-upload_user: meta-llama
-model_type: Llama-3.1-8B-Instruct
+upload_user: Qwen
+model_type: Qwen3-8B
 pretrained_model_name: ${upload_user}/${model_type}
 custom_data_encoder_path: ${connected_dir}/merged/data_encoders/${pretrained_model_name}
-reference_data_encoder_name: HuggingFaceTB/SmolLM2-135M-Instruct
-left_padding: false
+reference_data_encoder_name: Qwen/Qwen3-8B
+left_padding: true
+is_enable_thinking: false
 merged_model_path: ${connected_dir}/merged/models/${pretrained_model_name}
 data_max_length: 2048
 target_max_length: 2048
@@ -69,7 +70,7 @@ peft_config:
   task_type: CAUSAL_LM
   inference_mode: false
 
-lr: 3e-5
+lr: 5e-6
 weight_decay: 1e-1
 warmup_ratio: 5e-2
 eta_min_ratio: 1e-2
@@ -90,11 +91,11 @@ accelerator: gpu
 strategy: deepspeed_stage_3_offload
 log_every_n_steps: 10
 precision: bf16
-accumulate_grad_batches: 8
+accumulate_grad_batches: 1
 gradient_clip_val: 1
 gradient_clip_algorithm: norm
-epoch: 5
-step: 1e+3
+epoch: 2
+step: 250
 
 model_name: CausalLM-CPT
 mode: train
@@ -119,7 +120,7 @@ pred_name: ${save_detail}-step=${step}
 submission_name: ${save_detail}-step=${step}
 
 user_name: ${oc.env:USER_NAME}
-model_detail: Llama-3.1-8B-Instruct
+model_detail: Qwen3-8B
 upload_tag: open-Korean
 num_safetensors: 10
 
