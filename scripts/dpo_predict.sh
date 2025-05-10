@@ -4,22 +4,23 @@ is_sft=False
 is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
-upload_user="meta-llama"
-model_type="Llama-3.1-8B-Instruct"
-left_padding=False
+upload_user="Qwen"
+model_type="Qwen3-8B"
+left_padding=True
+is_enable_thinking=False
 quantization_type="origin"
 peft_type="origin"
 data_type="structural"
 dataset_name="open-Korean"
-data_max_length=2048
-target_max_length=2048
+data_max_length=1024
+target_max_length=1024
 precision="bf16"
-batch_size=16
-eval_batch_size=16
-accumulate_grad_batches=8
+batch_size=8
+eval_batch_size=8
+accumulate_grad_batches=2
 workers_ratio=8
 use_all_workers=False
-steps="170000 180000"
+steps="1000 1250"
 
 for step in $steps
 do
@@ -31,6 +32,7 @@ do
         upload_user=$upload_user \
         model_type=$model_type \
         left_padding=$left_padding \
+        is_enable_thinking=$is_enable_thinking \
         quantization_type=$quantization_type \
         peft_type=$peft_type \
         data_type=$data_type \
@@ -49,12 +51,14 @@ done
 for step in $steps
 do
     python merge_predictions.py \
+        is_sft=$is_sft \
         is_preprocessed=$is_preprocessed \
         is_tuned=$is_tuned \
         strategy=$strategy \
         upload_user=$upload_user \
         model_type=$model_type \
         left_padding=$left_padding \
+        is_enable_thinking=$is_enable_thinking \
         quantization_type=$quantization_type \
         peft_type=$peft_type \
         data_type=$data_type \

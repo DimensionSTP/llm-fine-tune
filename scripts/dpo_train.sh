@@ -1,36 +1,39 @@
 #!/bin/bash
 
 split_ratio=1e-2
+is_strict_split=False
 is_sft=False
 is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
-upload_user="meta-llama"
-model_type="Llama-3.1-8B-Instruct"
-left_padding=False
+upload_user="Qwen"
+model_type="Qwen3-8B"
+left_padding=True
+is_enable_thinking=False
 quantization_type="origin"
 peft_type="origin"
 data_type="structural"
 dataset_name="open-Korean"
-data_max_length=2048
-target_max_length=2048
+data_max_length=1024
+target_max_length=1024
 precision="bf16"
-batch_size=4
-eval_batch_size=4
-accumulate_grad_batches=4
-dpo_beta=0.5
-lr=3e-7
+batch_size=8
+eval_batch_size=8
+accumulate_grad_batches=2
+dpo_beta=0.1
+lr=5e-7
 weight_decay=1e-1
 warmup_ratio=5e-2
 eta_min_ratio=1e-2
-epoch=5
-step=1e+2
+epoch=2
+step=250
 workers_ratio=8
 use_all_workers=False
 convert_at_end=False
 
 python main.py --config-name=dpo.yaml mode=train \
     split_ratio=$split_ratio \
+    is_strict_split=$is_strict_split \
     is_sft=$is_sft \
     is_preprocessed=$is_preprocessed \
     is_tuned=$is_tuned \
@@ -38,6 +41,7 @@ python main.py --config-name=dpo.yaml mode=train \
     upload_user=$upload_user \
     model_type=$model_type \
     left_padding=$left_padding \
+    is_enable_thinking=$is_enable_thinking \
     quantization_type=$quantization_type \
     peft_type=$peft_type \
     data_type=$data_type \

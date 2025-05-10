@@ -5,8 +5,8 @@ is_sft=False
 is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
-upload_user="meta-llama"
-model_type="Llama-3.1-8B-Instruct"
+upload_user="Qwen"
+model_type="Qwen3-8B"
 quantization_type="origin"
 peft_type="origin"
 dataset_name="open-Korean"
@@ -14,7 +14,7 @@ data_max_length=2048
 target_max_length=2048
 precision="bf16"
 batch_size=16
-accumulate_grad_batches=8
+accumulate_grad_batches=1
 
 python $path/convert_zero_ckpt.py \
     is_sft=$is_sft \
