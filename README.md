@@ -3,6 +3,7 @@
 ## For (s)LLM model fine-tuning
 
 ### Dataset
+
 HuggingFace Korean dataset(preprocessed as instruction, input, and response)
 
 ### Quick setup
@@ -21,6 +22,7 @@ pip install -r requirements.txt
 ```
 
 ### .env file setting
+
 ```shell
 PROJECT_DIR={PROJECT_DIR}
 CONNECTED_DIR={CONNECTED_DIR}
@@ -32,6 +34,7 @@ USER_NAME={USER_NAME}
 ### Model Hyper-Parameters Tuning
 
 * end-to-end
+
 ```shell
 python main.py mode=tune is_tuned=untuned num_trials={num_trials}
 ```
@@ -39,6 +42,7 @@ python main.py mode=tune is_tuned=untuned num_trials={num_trials}
 ### Training
 
 * end-to-end
+
 ```shell
 python main.py mode=train is_tuned={tuned or untuned} num_trials={num_trials}
 ```
@@ -46,6 +50,7 @@ python main.py mode=train is_tuned={tuned or untuned} num_trials={num_trials}
 ### Test
 
 * end-to-end
+
 ```shell
 python main.py mode=test is_tuned={tuned or untuned} num_trials={num_trials} epoch={ckpt epoch}
 ```
@@ -53,6 +58,7 @@ python main.py mode=test is_tuned={tuned or untuned} num_trials={num_trials} epo
 ### Prediction
 
 * end-to-end
+
 ```shell
 python main.py mode=predict is_tuned={tuned or untuned} num_trials={num_trials} epoch={ckpt epoch}
 python merge_predictions.py is_tuned={tuned or untuned} num_trials={num_trials} epoch={ckpt epoch}
@@ -62,21 +68,25 @@ python decode_predictions.py is_tuned={tuned or untuned} num_trials={num_trials}
 ### Examples of shell scipts
 
 * full preprocessing
+
 ```shell
 bash scripts/preprocess.sh
 ```
 
 * dataset preprocessing
+
 ```shell
 bash scripts/preprocess_dataset.sh
 ```
 
 * train
+
 ```shell
 bash scripts/train.sh
 ```
 
 * predict
+
 ```shell
 bash scripts/predict.sh
 ```
@@ -84,42 +94,48 @@ bash scripts/predict.sh
 ### Additional Options
 
 * pure decoder based LLM QLoRA 4-bit quantization option
+
 ```shell
 quantization_type={origin or quantization} 
 ```
 
 * pure decoder based LLM LoRA or QLoRA PEFT option
+
 ```shell
 peft_type={origin or lora}
 ```
 
 * for LLM full fine-tuning(Continued Pretraining) in multi-GPU, recommended
+
 ```shell
 strategy={deepspeed_stage_2 or deepspeed_stage_2_offload or deepspeed_stage_3 or deepspeed_stage_3_offload}
 ```
 
 * for LLM DPO fine-tuning in multi-GPU, recommended
+
 ```shell
 strategy={deepspeed_stage_2 or deepspeed_stage_2_offload}
 ```
 
 * __for LLM DPO fine-tuning in multi-GPU, avoid using the following strategies to prevent errors!__
+
 ```shell
 strategy={deepspeed_stage_3 or deepspeed_stage_3_offload or fsdp}
 ```
 
 * upload user name and model name at HuggingFace Model card
+
 ```shell
 upload_user={upload_user} 
 model_type={model_type}
 ```
 
 * Set data and target max length for model training and generation
+
 ```shell
 data_max_length={data_max_length} 
 target_max_length={target_max_length} 
 ```
-
 
 __If you want to change main config, use --config-name={config_name}.__
 
