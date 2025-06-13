@@ -92,13 +92,13 @@ def train(
             raise TypeError(f"Invalid resumed_step argument: {config.resumed_step}")
         logger.experiment.alert(
             title="Training Complete",
-            text="Training process has successfully finished.",
+            text=f"Training process on {config.dataset_name} has successfully finished.",
             level="INFO",
         )
     except Exception as e:
         logger.experiment.alert(
             title="Training Error",
-            text="An error occurred during training",
+            text=f"An error occurred during training on {config.dataset_name}: {e}",
             level="ERROR",
         )
         raise e
@@ -201,13 +201,13 @@ def test(
             )
         logger.experiment.alert(
             title="Testing Complete",
-            text="Testing process has successfully finished.",
+            text=f"Testing process on {config.dataset_name} has successfully finished.",
             level="INFO",
         )
     except Exception as e:
         logger.experiment.alert(
             title="Testing Error",
-            text="An error occurred during testing",
+            text=f"An error occurred during testing on {config.dataset_name}: {e}",
             level="ERROR",
         )
         raise e
@@ -297,13 +297,13 @@ def predict(
             )
         logger.experiment.alert(
             title="Predicting Complete",
-            text="Predicting process has successfully finished.",
+            text=f"Predicting process on {config.dataset_name} has successfully finished.",
             level="INFO",
         )
     except Exception as e:
         logger.experiment.alert(
             title="Predicting Error",
-            text="An error occurred during predicting",
+            text=f"An error occurred during predicting on {config.dataset_name}: {e}",
             level="ERROR",
         )
         raise e
