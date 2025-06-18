@@ -20,6 +20,7 @@ structural:
   batch_size: ${batch_size}
   pretrained_model_name: ${pretrained_model_name}
   custom_data_encoder_path: ${custom_data_encoder_path}
+  revision: ${revision}
   reference_data_encoder_name: ${reference_data_encoder_name}
   left_padding: ${left_padding}
   is_enable_thinking: ${is_enable_thinking}
@@ -46,6 +47,7 @@ conversational:
   batch_size: ${batch_size}
   pretrained_model_name: ${pretrained_model_name}
   custom_data_encoder_path: ${custom_data_encoder_path}
+  revision: ${revision}
   reference_data_encoder_name: ${reference_data_encoder_name}
   left_padding: ${left_padding}
   is_enable_thinking: ${is_enable_thinking}
