@@ -33,6 +33,7 @@ class StructuralDataset(Dataset):
         batch_size: int,
         pretrained_model_name: str,
         custom_data_encoder_path: str,
+        revision: str,
         reference_data_encoder_name: str,
         left_padding: bool,
         is_enable_thinking: bool,
@@ -66,6 +67,7 @@ class StructuralDataset(Dataset):
         self.data_encoder = AutoTokenizer.from_pretrained(
             data_encoder_path,
             use_fast=True,
+            revision=revision,
         )
 
         if self.data_encoder.chat_template is None:
@@ -334,6 +336,7 @@ class ConversationalDataset(StructuralDataset):
         batch_size: int,
         pretrained_model_name: str,
         custom_data_encoder_path: str,
+        revision: str,
         reference_data_encoder_name: str,
         left_padding: bool,
         is_enable_thinking: bool,
@@ -365,6 +368,7 @@ class ConversationalDataset(StructuralDataset):
         self.data_encoder = AutoTokenizer.from_pretrained(
             data_encoder_path,
             use_fast=True,
+            revision=revision,
         )
 
         if self.data_encoder.chat_template is None:
