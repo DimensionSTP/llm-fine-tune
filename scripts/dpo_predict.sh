@@ -6,6 +6,7 @@ is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
 upload_user="Qwen"
 model_type="Qwen3-8B"
+revision="main"
 left_padding=True
 is_enable_thinking=False
 quantization_type="origin"
@@ -31,6 +32,7 @@ do
         strategy=$strategy \
         upload_user=$upload_user \
         model_type=$model_type \
+        revision=$revision \
         left_padding=$left_padding \
         is_enable_thinking=$is_enable_thinking \
         quantization_type=$quantization_type \
@@ -57,6 +59,7 @@ do
         strategy=$strategy \
         upload_user=$upload_user \
         model_type=$model_type \
+        revision=$revision \
         left_padding=$left_padding \
         is_enable_thinking=$is_enable_thinking \
         quantization_type=$quantization_type \
