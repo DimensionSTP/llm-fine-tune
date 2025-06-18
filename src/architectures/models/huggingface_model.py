@@ -17,6 +17,7 @@ class HuggingFaceModel(nn.Module):
     def __init__(
         self,
         pretrained_model_name: str,
+        revision: str,
         is_preprocessed: bool,
         custom_data_encoder_path: str,
         left_padding: bool,
@@ -30,6 +31,7 @@ class HuggingFaceModel(nn.Module):
     ) -> None:
         super().__init__()
         self.pretrained_model_name = pretrained_model_name
+        self.revision = revision
         self.is_preprocessed = is_preprocessed
         if is_preprocessed:
             data_encoder_path = custom_data_encoder_path
@@ -38,6 +40,7 @@ class HuggingFaceModel(nn.Module):
         self.data_encoder = AutoTokenizer.from_pretrained(
             data_encoder_path,
             use_fast=True,
+            revision=self.revision,
         )
         if self.data_encoder.pad_token_id is None:
             self.data_encoder.pad_token_id = self.data_encoder.eos_token_id
@@ -122,6 +125,7 @@ class HuggingFaceModel(nn.Module):
             attn_implementation=self.attn_implementation,
             quantization_config=self.quantization_config,
             device_map=self.device_map,
+            revision=self.revision,
         )
 
         if model.config.pad_token_id is None:
