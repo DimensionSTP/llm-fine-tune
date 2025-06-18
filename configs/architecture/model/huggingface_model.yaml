@@ -1,5 +1,6 @@
 _target_: src.architectures.HuggingFaceModel
 pretrained_model_name: ${pretrained_model_name}
+revision: ${revision}
 is_preprocessed: ${is_preprocessed}
 custom_data_encoder_path: ${custom_data_encoder_path}
 left_padding: ${left_padding}
