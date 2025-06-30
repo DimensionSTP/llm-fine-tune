@@ -54,6 +54,7 @@ merged_model_path: ${connected_dir}/merged/models/${pretrained_model_name}
 data_max_length: 1024
 target_max_length: 1024
 target_min_length: 16
+response_start_template: <|im_start|>${assistant_column_name}
 
 quantization_type: origin
 quantization_config:
