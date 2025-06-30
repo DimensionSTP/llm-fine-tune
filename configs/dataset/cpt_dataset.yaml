@@ -25,6 +25,7 @@ structural:
   is_enable_thinking: ${is_enable_thinking}
   data_max_length: ${data_max_length}
   target_max_length: ${target_max_length}
+  response_start_template: ${response_start_template}
 
 conversational:
   _target_: src.datasets.CPTConversationalDataset
@@ -40,7 +41,6 @@ conversational:
   conversation_column_name: ${conversation_column_name}
   role_column_name: ${role_column_name}
   content_column_name: ${content_column_name}
-  assistant_column_name: ${assistant_column_name}
   num_devices: ${devices}
   batch_size: ${batch_size}
   pretrained_model_name: ${pretrained_model_name}
@@ -51,3 +51,4 @@ conversational:
   is_enable_thinking: ${is_enable_thinking}
   data_max_length: ${data_max_length}
   target_max_length: ${target_max_length}
+  response_start_template: ${response_start_template}
