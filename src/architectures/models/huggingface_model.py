@@ -146,7 +146,10 @@ class HuggingFaceModel(nn.Module):
 
         if self.peft_type == "lora":
             model.enable_input_require_grads()
-            model = get_peft_model(model, self.peft_config)
+            model = get_peft_model(
+                model=model,
+                peft_config=self.peft_config,
+            )
         if self.peft_type not in ["origin", "lora"]:
             raise ValueError(f"Invalid PEFT type: {self.peft_type}.")
         return model
