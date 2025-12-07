@@ -5,7 +5,6 @@ dotenv.load_dotenv(
 )
 
 import os
-import pickle
 import warnings
 
 os.environ["HYDRA_FULL_ERROR"] = "1"
@@ -25,19 +24,26 @@ def merge_predictions(
     config: DictConfig,
 ) -> None:
     generation_dfs = []
-    for per_device_file_name in os.listdir(
-        f"{config.per_device_save_path}/generations"
-    ):
+    per_device_generation_save_path = os.path.join(
+        config.per_device_save_path,
+        "generations",
+    )
+    for per_device_file_name in os.listdir(per_device_generation_save_path):
         if per_device_file_name.endswith(".csv"):
-            per_device_generation_df = pd.read_csv(
-                f"{config.per_device_save_path}/generations/{per_device_file_name}"
+            per_device_generation_file_path = os.path.join(
+                per_device_generation_save_path,
+                per_device_file_name,
             )
+            per_device_generation_df = pd.read_csv(per_device_generation_file_path)
             per_device_generation_df.fillna("_")
             generation_dfs.append(per_device_generation_df)
 
-    generation_df = pd.read_csv(
-        f"{config.connected_dir}/data/{config.submission_file_name}.csv"
+    generation_df_path = os.path.join(
+        config.connected_dir,
+        "data",
+        f"{config.submission_file_name}.csv",
     )
+    generation_df = pd.read_csv(generation_df_path)
     combined_generation_df = pd.concat(generation_dfs)
     sorted_generation_df = combined_generation_df.sort_values(by="index").reset_index()
     all_generations = sorted_generation_df[config.target_column_name]
@@ -48,12 +54,22 @@ def merge_predictions(
     if len(all_generations) > len(generation_df):
         all_generations = all_generations[: len(generation_df)]
     generation_df[config.target_column_name] = all_generations
+
+    submission_save_path = os.path.join(
+        config.connected_dir,
+        "submissions",
+    )
     os.makedirs(
-        f"{config.connected_dir}/submissions",
+        submission_save_path,
         exist_ok=True,
     )
+
+    submission_file_path = os.path.join(
+        submission_save_path,
+        f"{config.submission_name}.csv",
+    )
     generation_df.to_csv(
-        f"{config.connected_dir}/submissions/{config.submission_name}.csv",
+        submission_file_path,
         index=False,
     )
 
