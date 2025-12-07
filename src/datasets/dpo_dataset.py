@@ -148,10 +148,25 @@ class StructuralDataset(Dataset):
                 self.data_path,
                 file_name,
             )
-            data = pd.read_parquet(full_data_path)
-            data = data.fillna("_")
         else:
             raise ValueError(f"Inavalid split: {self.split}")
+
+        if self.dataset_format == "parquet":
+            data = pd.read_parquet(full_data_path)
+        elif self.dataset_format in ["json", "jsonl"]:
+            data = pd.read_json(
+                full_data_path,
+                lines=True if self.dataset_format == "jsonl" else False,
+            )
+        elif self.dataset_format in ["csv", "tsv"]:
+            data = pd.read_csv(
+                full_data_path,
+                sep="\t" if self.dataset_format == "tsv" else None,
+            )
+        else:
+            raise ValueError(f"Unsupported dataset format: {self.dataset_format}")
+
+        data = data.fillna("_")
 
         if self.split == "train" and self.is_strict_split:
             train_data, _ = train_test_split(
@@ -255,22 +270,6 @@ class StructuralDataset(Dataset):
         encoded = {k: v.squeeze(0) for k, v in encoded.items()}
         return encoded
 
-    def find_pattern_indices(
-        self,
-        input_ids: torch.Tensor,
-        pattern: torch.Tensor,
-    ) -> List[int]:
-        pattern_length = pattern.size(0)
-
-        if pattern_length > input_ids.size(0):
-            return []
-
-        indices = []
-        for i in range(input_ids.size(0) - pattern_length + 1):
-            if torch.equal(input_ids[i : i + pattern_length], pattern):
-                indices.append(i)
-        return indices
-
     def add_sft_label(
         self,
         encoded: Dict[str, torch.Tensor],
@@ -309,6 +308,22 @@ class StructuralDataset(Dataset):
 
         encoded["labels"] = labels
         return encoded
+
+    def find_pattern_indices(
+        self,
+        input_ids: torch.Tensor,
+        pattern: torch.Tensor,
+    ) -> List[int]:
+        pattern_length = pattern.size(0)
+
+        if pattern_length > input_ids.size(0):
+            return []
+
+        indices = []
+        for i in range(input_ids.size(0) - pattern_length + 1):
+            if torch.equal(input_ids[i : i + pattern_length], pattern):
+                indices.append(i)
+        return indices
 
 
 class ConversationalDataset(StructuralDataset):
@@ -437,10 +452,25 @@ class ConversationalDataset(StructuralDataset):
                 self.data_path,
                 file_name,
             )
-            data = pd.read_parquet(full_data_path)
-            data = data.fillna("_")
         else:
             raise ValueError(f"Inavalid split: {self.split}")
+
+        if self.dataset_format == "parquet":
+            data = pd.read_parquet(full_data_path)
+        elif self.dataset_format in ["json", "jsonl"]:
+            data = pd.read_json(
+                full_data_path,
+                lines=True if self.dataset_format == "jsonl" else False,
+            )
+        elif self.dataset_format in ["csv", "tsv"]:
+            data = pd.read_csv(
+                full_data_path,
+                sep="\t" if self.dataset_format == "tsv" else None,
+            )
+        else:
+            raise ValueError(f"Unsupported dataset format: {self.dataset_format}")
+
+        data = data.fillna("_")
 
         if self.split == "train" and self.is_strict_split:
             train_data, _ = train_test_split(
