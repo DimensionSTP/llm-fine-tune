@@ -14,7 +14,7 @@ git clone https://github.com/DimensionSTP/llm-fine-tune.git
 cd llm-fine-tune
 
 # [OPTIONAL] create conda environment
-conda create -n myenv python=3.10 -y
+conda create -n myenv python=3.12 -y
 conda activate myenv
 
 # install requirements
