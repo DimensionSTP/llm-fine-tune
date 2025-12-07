@@ -8,24 +8,25 @@
 
 cd ~/llm-fine-tune
 
-module add compilers/cuda/12.4 compilers/gcc/10.2.0 libraries/nccl/2.21.5
+module add compilers/cuda/12.8 compilers/gcc/10.2.0 libraries/nccl/2.21.5
 source activate myenv
 
 split_ratio=1e-2
 is_strict_split=False
-is_sft=False
+is_sft=True
 is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
 upload_user="Qwen"
 model_type="Qwen3-8B"
 revision="main"
-left_padding=True
+left_padding=False
 is_enable_thinking=False
 quantization_type="origin"
 peft_type="origin"
 data_type="structural"
 dataset_name="open-Korean"
+dataset_format="parquet"
 data_max_length=1024
 target_max_length=1024
 precision="bf16"
@@ -59,6 +60,7 @@ python main.py --config-name=dpo.yaml mode=train \
     peft_type=$peft_type \
     data_type=$data_type \
     dataset_name=$dataset_name \
+    dataset_format=$dataset_format \
     data_max_length=$data_max_length \
     target_max_length=$target_max_length \
     precision=$precision \

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-is_sft=False
+is_sft=True
 is_preprocessed=False
 is_tuned="untuned"
 strategy="deepspeed_stage_3_offload"
@@ -13,6 +13,7 @@ quantization_type="origin"
 peft_type="origin"
 data_type="structural"
 dataset_name="open-Korean"
+dataset_format="parquet"
 data_max_length=2048
 target_max_length=2048
 precision="bf16"
@@ -39,6 +40,7 @@ do
         peft_type=$peft_type \
         data_type=$data_type \
         dataset_name=$dataset_name \
+        dataset_format=$dataset_format \
         data_max_length=$data_max_length \
         target_max_length=$target_max_length \
         precision=$precision \
@@ -66,6 +68,7 @@ do
         peft_type=$peft_type \
         data_type=$data_type \
         dataset_name=$dataset_name \
+        dataset_format=$dataset_format \
         data_max_length=$data_max_length \
         target_max_length=$target_max_length \
         precision=$precision \
