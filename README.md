@@ -70,25 +70,25 @@ python decode_predictions.py is_tuned={tuned or untuned} num_trials={num_trials}
 * full preprocessing
 
 ```shell
-bash scripts/preprocess.sh
+bash scripts/preprocess/preprocess.sh
 ```
 
 * dataset preprocessing
 
 ```shell
-bash scripts/preprocess_dataset.sh
+bash scripts/preprocess/preprocess_dataset.sh
 ```
 
 * train
 
 ```shell
-bash scripts/train.sh
+bash scripts/train/train.sh
 ```
 
 * predict
 
 ```shell
-bash scripts/predict.sh
+bash scripts/test/predict.sh
 ```
 
 ### Additional Options
